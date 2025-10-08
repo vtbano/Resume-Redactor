@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
   --background: #ffffff;
@@ -16,6 +16,12 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+  }
+  img[src='/github.svg'] {
+    filter: invert(1);
+  }
+  img[src='/peer-review.svg'] {
+    filter: invert(1);
   }
 }
 

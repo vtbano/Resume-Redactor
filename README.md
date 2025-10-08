@@ -1,3 +1,6 @@
+This project uses parts of OpenResume (by xitanggg) under the AGPL-3.0 license.
+Original source: https://github.com/xitanggg/open-resume
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
