@@ -70,28 +70,30 @@ export const ResumeDropzone = ({
     onFileUrlChange('')
   }
 
-  const onImportClick = async () => {
-    const resume = await parseResumeFromPdf(file.fileUrl)
-    const settings = deepClone(initialSettings)
+  // const onImportClick = async () => {
+  //   const resume = await parseResumeFromPdf(file.fileUrl)
+  //   console.log('Parsed resume:', resume)
+  //   const settings = deepClone(initialSettings)
 
-    // Set formToShow settings based on uploaded resume if users have used the app before
-    if (getHasUsedAppBefore()) {
-      const sections = Object.keys(settings.formToShow) as ShowForm[]
-      const sectionToFormToShow: Record<ShowForm, boolean> = {
-        workExperiences: resume.workExperiences.length > 0,
-        educations: resume.educations.length > 0,
-        projects: resume.projects.length > 0,
-        skills: resume.skills.descriptions.length > 0,
-        custom: resume.custom.descriptions.length > 0,
-      }
-      for (const section of sections) {
-        settings.formToShow[section] = sectionToFormToShow[section]
-      }
-    }
+  //   // Set formToShow settings based on uploaded resume if users have used the app before
+  //   if (getHasUsedAppBefore()) {
+  //     const sections = Object.keys(settings.formToShow) as ShowForm[]
+  //     console.log('sections:', sections)
+  //     const sectionToFormToShow: Record<ShowForm, boolean> = {
+  //       workExperiences: resume.workExperiences.length > 0,
+  //       educations: resume.educations.length > 0,
+  //       projects: resume.projects.length > 0,
+  //       skills: resume.skills.descriptions.length > 0,
+  //       custom: resume.custom.descriptions.length > 0,
+  //     }
+  //     for (const section of sections) {
+  //       settings.formToShow[section] = sectionToFormToShow[section]
+  //     }
+  //   }
 
-    saveStateToLocalStorage({ resume, settings })
-    router.push('/resume-builder')
-  }
+  //   saveStateToLocalStorage({ resume, settings })
+  //   router.push('/resume-builder')
+  // }
 
   return (
     <div
@@ -154,27 +156,27 @@ export const ResumeDropzone = ({
           </div>
         )}
         <div className="pt-4">
-          {!hasFile ? (
-            <>
-              <label
-                className={cx(
-                  'within-outline-theme-purple cursor-pointer rounded-full px-6 pb-2.5 pt-2 font-semibold shadow-sm',
-                  playgroundView ? 'border' : 'bg-primary'
-                )}
-              >
-                Browse file
-                <input
-                  type="file"
-                  className="sr-only"
-                  accept=".pdf"
-                  onChange={onInputChange}
-                />
-              </label>
-              {hasNonPdfFile && (
-                <p className="mt-6 text-red-400">Only pdf file is supported</p>
+          {/* {!hasFile ? ( */}
+          <>
+            <label
+              className={cx(
+                'within-outline-theme-purple cursor-pointer rounded-full px-6 pb-2.5 pt-2 font-semibold shadow-sm',
+                playgroundView ? 'border' : 'bg-primary'
               )}
-            </>
-          ) : (
+            >
+              Browse file
+              <input
+                type="file"
+                className="sr-only"
+                accept=".pdf"
+                onChange={onInputChange}
+              />
+            </label>
+            {hasNonPdfFile && (
+              <p className="mt-6 text-red-400">Only pdf file is supported</p>
+            )}
+          </>
+          {/* ) : (
             <>
               {!playgroundView && (
                 <button
@@ -190,7 +192,7 @@ export const ResumeDropzone = ({
                 single column resume
               </p>
             </>
-          )}
+          )} */}
         </div>
       </div>
     </div>
