@@ -1,14 +1,18 @@
 /*
  * This file is adapted from OpenResume (https://github.com/xitanggg/open-resume)
  * © 2024 xitanggg (or original authors), licensed under AGPL-3.0
+ *
+ *
  */
+
+import type { TextItem } from 'lib/parse-resume-from-pdf/types'
 export interface ResumeProfile {
-  name: string
-  email: string
-  phone: string
-  url: string
-  summary: string
-  location: string
+  name: TextItem
+  email: TextItem
+  phone: TextItem
+  url: TextItem
+  summary: TextItem | string
+  location: TextItem
 }
 
 export interface ResumeWorkExperience {

@@ -35,7 +35,24 @@ export type FeatureSet =
 
 export interface TextScore {
   text: string
+  x: number
+  y: number
+  width: number
+  height: number
+  fontName: string
+  hasEOL: boolean
   score: number
   match: boolean
 }
+
+export const emptyTextItemDetails: TextItem = {
+  text: '',
+  x: 0,
+  y: 0,
+  width: 0,
+  height: 0,
+  fontName: '',
+  hasEOL: false,
+}
+// perhaps update this to also include the other values from the TextItem
 export type TextScores = TextScore[]

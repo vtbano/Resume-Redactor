@@ -3,10 +3,12 @@
  * © 2024 xitanggg (or original authors), licensed under AGPL-3.0
  */
 
-import type {
+import {
   TextItems,
+  TextItem,
   TextScores,
   FeatureSet,
+  emptyTextItemDetails,
 } from 'lib/parse-resume-from-pdf/types'
 
 const computeFeatureScores = (
@@ -15,6 +17,12 @@ const computeFeatureScores = (
 ): TextScores => {
   const textScores = textItems.map((item) => ({
     text: item.text,
+    x: item.x,
+    y: item.y,
+    width: item.width,
+    height: item.height,
+    fontName: item.fontName,
+    hasEOL: item.hasEOL,
     score: 0,
     match: false,
   }))
@@ -38,7 +46,17 @@ const computeFeatureScores = (
             textScore.match = true
           }
         } else {
-          textScores.push({ text, score, match: true })
+          textScores.push({
+            text,
+            x: textItem.x,
+            y: textItem.y,
+            width: textItem.width,
+            height: textItem.height,
+            fontName: textItem.fontName,
+            hasEOL: textItem.hasEOL,
+            score,
+            match: true,
+          })
         }
       }
     }
@@ -60,25 +78,36 @@ export const getTextWithHighestFeatureScore = (
 ) => {
   const textScores = computeFeatureScores(textItems, featureSets)
 
-  let textsWithHighestFeatureScore: string[] = []
+  let textWithHighestFeatureScore: TextItem = emptyTextItemDetails
   let highestScore = -Infinity
-  for (const { text, score } of textScores) {
+  for (const {
+    text,
+    score,
+    x,
+    y,
+    width,
+    height,
+    fontName,
+    hasEOL,
+  } of textScores) {
     if (score >= highestScore) {
       if (score > highestScore) {
-        textsWithHighestFeatureScore = []
+        textWithHighestFeatureScore = {
+          text,
+          x,
+          y,
+          width,
+          height,
+          fontName,
+          hasEOL,
+        }
+        highestScore = score
       }
-      textsWithHighestFeatureScore.push(text)
-      highestScore = score
     }
   }
 
   if (returnEmptyStringIfHighestScoreIsNotPositive && highestScore <= 0)
-    return ['', textScores] as const
+    return [emptyTextItemDetails, textScores] as const
 
-  // Note: If textItems is an empty array, textsWithHighestFeatureScore[0] is undefined, so we default it to empty string
-  const text = !returnConcatenatedStringForTextsWithSameHighestScore
-    ? textsWithHighestFeatureScore[0] ?? ''
-    : textsWithHighestFeatureScore.map((s) => s.trim()).join(' ')
-
-  return [text, textScores] as const
+  return [textWithHighestFeatureScore, textScores] as const
 }
