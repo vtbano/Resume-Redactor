@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { ResumeDropzone } from './components/ResumeDropzone'
+import { ResumeModifier } from 'components/ResumeModifier'
 import Link from 'next/link'
 import { readPdf } from 'lib/parse-resume-from-pdf/read-pdf'
 import type { TextItems } from 'lib/parse-resume-from-pdf/types'
@@ -37,6 +38,8 @@ export default function Home() {
   useEffect(() => {
     async function test() {
       const textItems = await readPdf(fileUrl)
+
+      //You have all the text items from the pdf broken out. Now it needs to go though the parser logic to figure what is a name
       setTextItems(textItems)
     }
     test()
@@ -62,8 +65,15 @@ export default function Home() {
             />
           </div>
         </div>
+
         <div className="w-[800px] h-[900px]">
+          <h2 className="text-xl font-bold mb-2">Original</h2>
           <iframe src={`${fileUrl}#navpanes=0`} className="h-full w-full" />
+        </div>
+
+        <div>
+          <h2 className="text-xl font-bold mb-2">Modified</h2>
+          <ResumeModifier pdfURL={fileUrl} />
         </div>
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
