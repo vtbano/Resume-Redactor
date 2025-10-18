@@ -70,31 +70,6 @@ export const ResumeDropzone = ({
     onFileUrlChange('')
   }
 
-  // const onImportClick = async () => {
-  //   const resume = await parseResumeFromPdf(file.fileUrl)
-  //   console.log('Parsed resume:', resume)
-  //   const settings = deepClone(initialSettings)
-
-  //   // Set formToShow settings based on uploaded resume if users have used the app before
-  //   if (getHasUsedAppBefore()) {
-  //     const sections = Object.keys(settings.formToShow) as ShowForm[]
-  //     console.log('sections:', sections)
-  //     const sectionToFormToShow: Record<ShowForm, boolean> = {
-  //       workExperiences: resume.workExperiences.length > 0,
-  //       educations: resume.educations.length > 0,
-  //       projects: resume.projects.length > 0,
-  //       skills: resume.skills.descriptions.length > 0,
-  //       custom: resume.custom.descriptions.length > 0,
-  //     }
-  //     for (const section of sections) {
-  //       settings.formToShow[section] = sectionToFormToShow[section]
-  //     }
-  //   }
-
-  //   saveStateToLocalStorage({ resume, settings })
-  //   router.push('/resume-builder')
-  // }
-
   return (
     <div
       className={cx(

@@ -52,10 +52,7 @@ export interface ResumeCustom {
 
 export interface Resume {
   profile: ResumeProfile
-  workExperiences: ResumeWorkExperience[]
   educations: ResumeEducation[]
-  projects: ResumeProject[]
-  skills: ResumeSkills
   custom: ResumeCustom
 }
 
