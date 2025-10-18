@@ -1,6 +1,14 @@
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
+import {
+  PDFDocument,
+  rgb,
+  StandardFonts,
+  PDFForm,
+  PDFPage,
+  PDFFont,
+} from 'pdf-lib'
 import { useState } from 'react'
 import { parseResumeFromPdf } from 'lib/parse-resume-from-pdf'
+import Button from 'components/Button'
 // import {
 //   getHasUsedAppBefore,
 //   saveStateToLocalStorage,
@@ -18,37 +26,67 @@ export const ResumeModifier = ({ pdfURL = '' }: { pdfURL?: string }) => {
     const existingPdfBytes = await fetch(url).then((res) => res.arrayBuffer())
 
     const pdfDoc = await PDFDocument.load(existingPdfBytes)
-    // const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica)
+    const helveticaFont = await pdfDoc.embedFont(
+      StandardFonts.CourierBoldOblique
+    )
 
     const form = pdfDoc.getForm()
 
     const pages = pdfDoc.getPages()
+    console.log('PAGES', pages)
     const firstPage = pages[0]
 
-    const nameField = form.createTextField('nameField')
-    nameField.setText('REDACTED')
-    nameField.addToPage(firstPage, {
-      x: resume.profile.name.x || 0,
-      y: resume.profile.name.y - 3 || 0,
-      width: resume.profile.name.width || 100,
-      height: resume.profile.name.height || 20,
-      textColor: rgb(0, 0, 0),
-      backgroundColor: rgb(1, 1, 1),
-      borderColor: rgb(1, 0, 0),
-      borderWidth: 0,
+    function addRedactedField({
+      form,
+      fieldName,
+      page,
+      fieldData,
+      font,
+      textBottomOffset = 0,
+      heightOffset = 0,
+    }: {
+      form: PDFForm
+      fieldName: string
+      page: PDFPage
+      fieldData: { x: number; y: number; width: number; height: number }
+      font: PDFFont
+      textBottomOffset: number
+      heightOffset: number
+    }) {
+      const field = form.createTextField(fieldName)
+      field.setText(`REDACTED ${fieldName.toLocaleUpperCase()}`)
+      field.enableReadOnly()
+      field.addToPage(page, {
+        x: fieldData.x,
+        y: fieldData.y + textBottomOffset,
+        width: fieldData.width,
+        height: fieldData.height + heightOffset,
+        textColor: rgb(0, 0, 0),
+        backgroundColor: rgb(1, 1, 1),
+        borderColor: rgb(1, 0, 0),
+        borderWidth: 0,
+        font,
+      })
+    }
+
+    addRedactedField({
+      form,
+      fieldName: 'name',
+      page: firstPage,
+      fieldData: resume.profile.name,
+      font: helveticaFont,
+      textBottomOffset: -4,
+      heightOffset: 2,
     })
 
-    const emailField = form.createTextField('emailField')
-    emailField.setText('REDACTED')
-    emailField.addToPage(firstPage, {
-      x: resume.profile.email.x || 0,
-      y: resume.profile.email.y - 3 || 0,
-      width: resume.profile.email.width || 100,
-      height: resume.profile.email.height + 1 || 20,
-      textColor: rgb(0, 0, 0),
-      backgroundColor: rgb(0.98, 0.98, 0.98),
-      borderColor: rgb(1, 0, 0),
-      borderWidth: 0,
+    addRedactedField({
+      form,
+      fieldName: 'email',
+      page: firstPage,
+      fieldData: resume.profile.email,
+      font: helveticaFont,
+      textBottomOffset: -4,
+      heightOffset: 2,
     })
 
     const pdfBytes = await pdfDoc.save()
@@ -72,12 +110,10 @@ export const ResumeModifier = ({ pdfURL = '' }: { pdfURL?: string }) => {
           </div>
         )}
       </div>
-      <button className="btn" onClick={modifyPdf}>
+      <Button onClick={modifyPdf} className="mr-4">
         Modify PDF
-      </button>
-      <button className="btn" onClick={() => setModifiedDoc('')}>
-        Reset
-      </button>
+      </Button>
+      <Button onClick={() => setModifiedDoc('')}>Reset</Button>
     </div>
   )
 }

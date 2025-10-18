@@ -151,23 +151,6 @@ export const ResumeDropzone = ({
               <p className="mt-6 text-red-400">Only pdf file is supported</p>
             )}
           </>
-          {/* ) : (
-            <>
-              {!playgroundView && (
-                <button
-                  type="button"
-                  className="btn-primary"
-                  onClick={onImportClick}
-                >
-                  Import and Continue <span aria-hidden="true">→</span>
-                </button>
-              )}
-              <p className={cx(' text-gray-500', !playgroundView && 'mt-6')}>
-                Note: {!playgroundView ? 'Import' : 'Parser'} works best on
-                single column resume
-              </p>
-            </>
-          )} */}
         </div>
       </div>
     </div>
