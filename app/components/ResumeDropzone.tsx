@@ -1,7 +1,6 @@
 import { useState, useRef } from 'react'
 import { LockClosedIcon } from '@heroicons/react/24/solid'
 import { XMarkIcon } from '@heroicons/react/24/outline'
-import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { cx } from 'lib/utils/cx'
 
@@ -14,18 +13,15 @@ const defaultFileState = {
 export const ResumeDropzone = ({
   onFileUrlChange,
   className,
-  playgroundView = false,
   setModifiedDoc,
 }: {
   onFileUrlChange: (fileUrl: string) => void
   className?: string
-  playgroundView?: boolean
   setModifiedDoc: (doc: string) => void
 }) => {
   const [file, setFile] = useState(defaultFileState)
   const [isHoveredOnDropzone, setIsHoveredOnDropzone] = useState(false)
   const [hasNonPdfFile, setHasNonPdfFile] = useState(false)
-  const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const hasFile = Boolean(file.name)
@@ -75,7 +71,7 @@ export const ResumeDropzone = ({
       className={cx(
         'flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 ',
         isHoveredOnDropzone && 'border-sky-400',
-        playgroundView ? 'pb-6 pt-4' : 'py-12',
+        'pb-6 pt-4',
         className
       )}
       onDragOver={(event) => {
@@ -85,29 +81,10 @@ export const ResumeDropzone = ({
       onDragLeave={() => setIsHoveredOnDropzone(false)}
       onDrop={onDrop}
     >
-      <div
-        className={cx(
-          'text-center',
-          playgroundView ? 'space-y-2' : 'space-y-3'
-        )}
-      >
-        {!playgroundView && (
-          <Image
-            src="/add-pdf.svg"
-            className="mx-auto h-14 w-14"
-            alt="Add pdf"
-            aria-hidden="true"
-            priority
-          />
-        )}
+      <div className={cx('text-center', 'space-y-2')}>
         {!hasFile ? (
           <>
-            <p
-              className={cx(
-                'pt-3 text-gray-700',
-                !playgroundView && 'text-lg font-semibold'
-              )}
-            >
+            <p className={cx('pt-3 text-gray-700')}>
               Browse a pdf file or drop it here
             </p>
             <p className="flex text-sm text-gray-500">
@@ -131,12 +108,11 @@ export const ResumeDropzone = ({
           </div>
         )}
         <div className="pt-4">
-          {/* {!hasFile ? ( */}
           <>
             <label
               className={cx(
                 'within-outline-theme-purple cursor-pointer rounded-full px-6 pb-2.5 pt-2 font-semibold shadow-sm',
-                playgroundView ? 'border' : 'bg-primary'
+                'border'
               )}
             >
               Browse file

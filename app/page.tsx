@@ -1,54 +1,20 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Image from 'next/image'
 import { ResumeDropzone } from './components/ResumeDropzone'
-import { ResumeModifier } from 'components/ResumeModifier'
+import { ModifiedResumeViewer } from 'components/ModifiedResumeViewer'
 import Link from 'next/link'
-import { readPdf } from 'lib/parse-resume-from-pdf/read-pdf'
-import type { TextItems } from 'lib/parse-resume-from-pdf/types'
 import { ResumeViewer } from 'components/ResumeViewer'
 import Button from 'components/Button'
 import { modifyPdf } from 'lib/modify-pdf'
 
-const RESUME_EXAMPLES = [
-  {
-    fileUrl: 'resume-example/laverne-resume.pdf',
-    description: (
-      <span>
-        Borrowed from University of La Verne Career Center -{' '}
-        <Link href="https://laverne.edu/careers/wp-content/uploads/sites/15/2010/12/Undergraduate-Student-Resume-Examples.pdf">
-          Link
-        </Link>
-      </span>
-    ),
-  },
-  {
-    fileUrl: 'resume-example/openresume-resume.pdf',
-    description: (
-      <span>
-        Created with OpenResume resume builder -{' '}
-        <Link href="/resume-builder">Link</Link>
-      </span>
-    ),
-  },
-]
-
-const defaultFileUrl = RESUME_EXAMPLES[1]['fileUrl']
+const defaultResumeExampleUrl = 'resume-example/openresume-resume.pdf'
 
 export default function Home() {
-  const [fileUrl, setFileUrl] = useState(defaultFileUrl)
-  const [textItems, setTextItems] = useState<TextItems>([])
+  const [fileUrl, setFileUrl] = useState(defaultResumeExampleUrl)
   const [modifiedDoc, setModifiedDoc] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
-
-  useEffect(() => {
-    async function test() {
-      const textItems = await readPdf(fileUrl)
-      setTextItems(textItems)
-    }
-    test()
-  }, [fileUrl])
 
   const handleModifyPdf = async () => {
     try {
@@ -66,7 +32,7 @@ export default function Home() {
 
   const onReset = () => {
     setModifiedDoc('')
-    setFileUrl(defaultFileUrl)
+    setFileUrl(defaultResumeExampleUrl)
   }
 
   return (
@@ -80,15 +46,16 @@ export default function Home() {
 
         <div className="mt-3 mx-auto w-full max-w-[1600px]">
           <ResumeDropzone
-            onFileUrlChange={(fileUrl) => setFileUrl(fileUrl || defaultFileUrl)}
-            playgroundView={true}
+            onFileUrlChange={(fileUrl) =>
+              setFileUrl(fileUrl || defaultResumeExampleUrl)
+            }
             setModifiedDoc={setModifiedDoc}
           />
         </div>
         <Button onClick={handleModifyPdf} className="mr-4">
           Modify PDF
         </Button>
-        {modifiedDoc && fileUrl === defaultFileUrl && (
+        {modifiedDoc && fileUrl === defaultResumeExampleUrl && (
           <div className="mt-3">
             <Button onClick={onReset}>Clear Example</Button>
           </div>
@@ -108,10 +75,12 @@ export default function Home() {
         <ResumeViewer
           pdfURL={fileUrl}
           documentName={
-            fileUrl === defaultFileUrl ? 'Example Resume' : 'Uploaded Resume'
+            fileUrl === defaultResumeExampleUrl
+              ? 'Example Resume'
+              : 'Uploaded Resume'
           }
         />
-        <ResumeModifier
+        <ModifiedResumeViewer
           modifiedDoc={modifiedDoc}
           loading={loading}
           error={error}
