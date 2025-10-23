@@ -1,6 +1,6 @@
 import { ResumeViewer } from './ResumeViewer'
 
-export const ResumeModifier = ({
+export const ModifiedResumeViewer = ({
   modifiedDoc,
   loading,
   error,
