@@ -6,6 +6,9 @@ import { ResumeModifier } from 'components/ResumeModifier'
 import Link from 'next/link'
 import { readPdf } from 'lib/parse-resume-from-pdf/read-pdf'
 import type { TextItems } from 'lib/parse-resume-from-pdf/types'
+import { ResumeViewer } from 'components/ResumeViewer'
+import Button from 'components/Button'
+import { modifyPdf } from 'lib/modify-pdf'
 
 const RESUME_EXAMPLES = [
   {
@@ -30,76 +33,109 @@ const RESUME_EXAMPLES = [
   },
 ]
 
-const defaultFileUrl = RESUME_EXAMPLES[0]['fileUrl']
+const defaultFileUrl = RESUME_EXAMPLES[1]['fileUrl']
 
 export default function Home() {
   const [fileUrl, setFileUrl] = useState(defaultFileUrl)
   const [textItems, setTextItems] = useState<TextItems>([])
+  const [modifiedDoc, setModifiedDoc] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
+
   useEffect(() => {
     async function test() {
       const textItems = await readPdf(fileUrl)
-
-      //You have all the text items from the pdf broken out. Now it needs to go though the parser logic to figure what is a name
       setTextItems(textItems)
     }
     test()
   }, [fileUrl])
 
+  const handleModifyPdf = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      const result = await modifyPdf(fileUrl)
+      setModifiedDoc(result)
+    } catch (err) {
+      console.error('Error modifying PDF:', err)
+      setError(err instanceof Error ? err : new Error('Error modifying PDF'))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const onReset = () => {
+    setModifiedDoc('')
+    setFileUrl(defaultFileUrl)
+  }
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-row gap-[32px] row-start-2 items-center sm:items-center">
-        <div className="w-[420px]">
-          <h1 className="text-4xl font-bold text-center sm:text-left">
-            Resume Redactor
-          </h1>
-          <p className="max-w-[700px] text-center sm:text-left">
-            Welcome to Resume Redactor. A tool that helps you redact personal
-            information from resumes.
-          </p>
+    <div className="flex flex-col items-center min-h-screen font-sans p-8 pb-20 gap-16 sm:p-20">
+      <div className="w-full max-w-[1600px] mx-auto items-center text-center">
+        <h1 className="text-4xl font-bold">Resume Redactor</h1>
+        <p className="max-w-[700px]">
+          Welcome to Resume Redactor. A tool that helps you redact personal
+          information from resumes.
+        </p>
+
+        <div className="mt-3 mx-auto w-full max-w-[1600px]">
+          <ResumeDropzone
+            onFileUrlChange={(fileUrl) => setFileUrl(fileUrl || defaultFileUrl)}
+            playgroundView={true}
+            setModifiedDoc={setModifiedDoc}
+          />
+        </div>
+        <Button onClick={handleModifyPdf} className="mr-4">
+          Modify PDF
+        </Button>
+        {modifiedDoc && fileUrl === defaultFileUrl && (
           <div className="mt-3">
-            <ResumeDropzone
-              onFileUrlChange={(fileUrl) =>
-                setFileUrl(fileUrl || defaultFileUrl)
-              }
-              playgroundView={true}
-            />
+            <Button onClick={onReset}>Clear Example</Button>
           </div>
-        </div>
+        )}
+      </div>
 
-        <div className="w-[800px] h-[900px]">
-          <h2 className="text-xl font-bold mb-2">Original</h2>
-          <iframe src={`${fileUrl}#navpanes=0`} className="h-full w-full" />
-        </div>
-
-        <div>
-          <h2 className="text-xl font-bold mb-2">Modified</h2>
-          <ResumeModifier pdfURL={fileUrl} />
-        </div>
+      <main
+        className="
+      flex flex-col lg:flex-row
+      justify-center 2xl: items-start
+      gap-8
+      w-full
+      max-w-[1600px]
+      mx-auto
+    "
+      >
+        <ResumeViewer
+          pdfURL={fileUrl}
+          documentName={
+            fileUrl === defaultFileUrl ? 'Example Resume' : 'Uploaded Resume'
+          }
+        />
+        <ResumeModifier
+          modifiedDoc={modifiedDoc}
+          loading={loading}
+          error={error}
+        />
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
+
+      {/* FOOTER */}
+      <footer className="mt-auto flex gap-6 flex-wrap items-center justify-center border-t border-gray-200 p-6">
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
           href="https://github.com/vtbano"
           target="_blank"
           rel="noopener noreferrer"
         >
-          <Image
-            aria-hidden
-            src="/github.svg"
-            alt="Github icon"
-            width={16}
-            height={16}
-          />
+          <Image src="/github.svg" alt="Github icon" width={16} height={16} />
           My Github
         </a>
         <a
           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+          href="https://linkedin.com/in/vanessatbano"
           target="_blank"
           rel="noopener noreferrer"
         >
           <Image
-            aria-hidden
             src="/linkedin.svg"
             alt="Linkedin icon"
             width={16}
@@ -114,7 +150,6 @@ export default function Home() {
           rel="noopener noreferrer"
         >
           <Image
-            aria-hidden
             src="/peer-review.svg"
             alt="Review icon"
             width={16}

@@ -1,16 +1,9 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { LockClosedIcon } from '@heroicons/react/24/solid'
 import { XMarkIcon } from '@heroicons/react/24/outline'
-import { parseResumeFromPdf } from 'lib/parse-resume-from-pdf'
-import {
-  getHasUsedAppBefore,
-  saveStateToLocalStorage,
-} from 'lib/redux/local-storage'
-import { type ShowForm, initialSettings } from 'lib/redux/settingsSlice'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { cx } from 'lib/utils/cx'
-import { deepClone } from 'lib/utils/deep-clone'
 
 const defaultFileState = {
   name: '',
@@ -22,15 +15,18 @@ export const ResumeDropzone = ({
   onFileUrlChange,
   className,
   playgroundView = false,
+  setModifiedDoc,
 }: {
   onFileUrlChange: (fileUrl: string) => void
   className?: string
   playgroundView?: boolean
+  setModifiedDoc: (doc: string) => void
 }) => {
   const [file, setFile] = useState(defaultFileState)
   const [isHoveredOnDropzone, setIsHoveredOnDropzone] = useState(false)
   const [hasNonPdfFile, setHasNonPdfFile] = useState(false)
   const router = useRouter()
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const hasFile = Boolean(file.name)
 
@@ -66,8 +62,12 @@ export const ResumeDropzone = ({
   }
 
   const onRemove = () => {
+    setModifiedDoc('')
     setFile(defaultFileState)
     onFileUrlChange('')
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''
+    }
   }
 
   return (
@@ -141,6 +141,7 @@ export const ResumeDropzone = ({
             >
               Browse file
               <input
+                ref={fileInputRef}
                 type="file"
                 className="sr-only"
                 accept=".pdf"
