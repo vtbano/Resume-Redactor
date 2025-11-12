@@ -1,12 +1,14 @@
 'use client'
 import { useState } from 'react'
+import Select from 'react-select'
+import { MultiValue } from 'react-select'
 import Image from 'next/image'
 import { ResumeDropzone } from './components/ResumeDropzone'
 import { ModifiedResumeViewer } from 'components/ModifiedResumeViewer'
-import Link from 'next/link'
 import { ResumeViewer } from 'components/ResumeViewer'
 import Button from 'components/Button'
 import { modifyPdf } from 'lib/modify-pdf'
+import { RedactionFields } from 'lib/modify-pdf/types'
 
 const defaultResumeExampleUrl = 'resume-example/openresume-resume.pdf'
 
@@ -15,12 +17,73 @@ export default function Home() {
   const [modifiedDoc, setModifiedDoc] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
+  const [redactionFields, setRedactionFields] = useState<RedactionFields>({
+    name: false,
+    email: false,
+    phone: false,
+    location: false,
+    url: false,
+  })
+
+  const redactionOptions = (
+    Object.keys(redactionFields) as (keyof RedactionFields)[]
+  ).map((key) => ({
+    value: key,
+    label: key,
+  }))
+
+  const createRedactionFieldsFromSelected = (
+    selected: (keyof RedactionFields)[]
+  ) => {
+    return Object.fromEntries(
+      (Object.keys(redactionFields) as (keyof RedactionFields)[]).map((key) => [
+        key,
+        selected.includes(key),
+      ])
+    ) as RedactionFields
+  }
+
+  const handleRedactionChange = (
+    selectedOptions: MultiValue<{
+      value: keyof RedactionFields
+      label: keyof RedactionFields
+    }>
+  ) => {
+    const selected = selectedOptions
+      ? selectedOptions.map(
+          (option: {
+            value: keyof RedactionFields
+            label: keyof RedactionFields
+          }) => option.value
+        )
+      : []
+
+    console.log('selected', selected)
+    setRedactionFields(createRedactionFieldsFromSelected(selected))
+
+    // setRedactionFields({
+    //   name: selected.includes('name'),
+    //   email: selected.includes('email'),
+    //   phone: selected.includes('phone'),
+    //   location: selected.includes('location'),
+    //   url: selected.includes('url'),
+    // })
+  }
+
+  const handleSelectAll = () => {
+    const allKeys = Object.keys(redactionFields) as (keyof RedactionFields)[]
+    setRedactionFields(createRedactionFieldsFromSelected(allKeys))
+  }
+
+  const handleDeselectAll = () => {
+    setRedactionFields(createRedactionFieldsFromSelected([]))
+  }
 
   const handleModifyPdf = async () => {
     try {
       setLoading(true)
       setError(null)
-      const result = await modifyPdf(fileUrl)
+      const result = await modifyPdf(fileUrl, redactionFields)
       setModifiedDoc(result)
     } catch (err) {
       console.error('Error modifying PDF:', err)
@@ -52,14 +115,44 @@ export default function Home() {
             setModifiedDoc={setModifiedDoc}
           />
         </div>
-        <Button onClick={handleModifyPdf} className="mr-4">
-          Modify PDF
-        </Button>
-        {modifiedDoc && fileUrl === defaultResumeExampleUrl && (
-          <div className="mt-3">
-            <Button onClick={onReset}>Clear Example</Button>
+        <div className="flex flex-col gap-3 mt-6 items-center">
+          <label className="mr-2">Select Fields to Redact</label>
+          <div className="flex gap-2 mb-2">
+            <Button
+              type="button"
+              onClick={handleSelectAll}
+              variant="secondary"
+              className="text-sm px-3 py-1"
+            >
+              Select All
+            </Button>
+            <Button
+              type="button"
+              onClick={handleDeselectAll}
+              variant="secondary"
+              className="text-sm px-3 py-1"
+            >
+              Deselect All
+            </Button>
           </div>
-        )}
+          <Select
+            isMulti
+            options={redactionOptions}
+            value={redactionOptions.filter(
+              (option) => redactionFields[option.value]
+            )}
+            onChange={handleRedactionChange}
+            placeholder="Options"
+            className="min-w-[300px]"
+          />
+
+          <Button type="button" onClick={handleModifyPdf} className="mr-4">
+            Modify PDF
+          </Button>
+          {modifiedDoc && fileUrl === defaultResumeExampleUrl && (
+            <Button onClick={onReset}>Clear Example</Button>
+          )}
+        </div>
       </div>
 
       <main

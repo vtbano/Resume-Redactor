@@ -4,7 +4,12 @@ import { parseResumeFromPdf } from 'lib/parse-resume-from-pdf'
 
 import { addRedactedField } from 'lib/modify-pdf/addRedactedField'
 
-export async function modifyPdf(pdfURL: string) {
+import { RedactionFields, RedactionFieldConfig } from 'lib/modify-pdf/types'
+
+export async function modifyPdf(
+  pdfURL: string,
+  redactionFieldsRequested: RedactionFields
+) {
   const url = pdfURL
   const resume = await parseResumeFromPdf(pdfURL)
   console.log('Parsed resume from resume modifier:', resume.profile)
@@ -19,25 +24,26 @@ export async function modifyPdf(pdfURL: string) {
   console.log('PAGES', pages)
   const firstPage = pages[0]
 
-  // executed addRedactedField for name and email only for demo purposes
-  addRedactedField({
-    form,
-    fieldName: 'name',
-    page: firstPage,
-    fieldData: resume.profile.name,
-    font: helveticaFont,
-    textBottomOffset: -4,
-    heightOffset: 2,
-  })
+  const fields: RedactionFieldConfig[] = [
+    { key: 'name', data: resume.profile.name },
+    { key: 'email', data: resume.profile.email },
+    { key: 'phone', data: resume.profile.phone },
+    { key: 'location', data: resume.profile.location },
+    { key: 'url', data: resume.profile.url },
+  ]
 
-  addRedactedField({
-    form,
-    fieldName: 'email',
-    page: firstPage,
-    fieldData: resume.profile.email,
-    font: helveticaFont,
-    textBottomOffset: -4,
-    heightOffset: 2,
+  fields.forEach((field) => {
+    if (redactionFieldsRequested[field.key as keyof RedactionFields]) {
+      addRedactedField({
+        form,
+        fieldName: field.key,
+        page: firstPage,
+        fieldData: field.data,
+        font: helveticaFont,
+        textBottomOffset: -4,
+        heightOffset: 2,
+      })
+    }
   })
   const pdfBytes = await pdfDoc.save()
   const arrayBuffer =
