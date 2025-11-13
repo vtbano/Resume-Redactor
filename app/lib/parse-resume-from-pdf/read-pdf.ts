@@ -10,12 +10,17 @@ pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js'
 import type { TextItem as PdfjsTextItem } from 'pdfjs-dist/types/src/display/api'
 import type { TextItem, TextItems } from 'lib/parse-resume-from-pdf/types'
 
+/*
+ *  readPdf function modified by Resume Redactor Author
+ *  to send over the page number as part of the TextItem object
+ */
+
 export const readPdf = async (fileUrl: string): Promise<TextItems> => {
   const pdfFile = await pdfjs.getDocument(fileUrl).promise
   let textItems: TextItems = []
 
-  for (let i = 1; i <= pdfFile.numPages; i++) {
-    const page = await pdfFile.getPage(i)
+  for (let pageNumber = 1; pageNumber <= pdfFile.numPages; pageNumber++) {
+    const page = await pdfFile.getPage(pageNumber)
     const textContent = await page.getTextContent()
     await page.getOperatorList()
 
@@ -44,6 +49,7 @@ export const readPdf = async (fileUrl: string): Promise<TextItems> => {
         text: newText,
         x,
         y,
+        pageNumber,
       }
     })
 

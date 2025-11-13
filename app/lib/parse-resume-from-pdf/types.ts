@@ -12,6 +12,7 @@ export interface TextItem {
   height: number
   fontName: string
   hasEOL: boolean
+  pageNumber: number
 }
 export type TextItems = TextItem[]
 
@@ -53,6 +54,7 @@ export const emptyTextItemDetails: TextItem = {
   height: 0,
   fontName: '',
   hasEOL: false,
+  pageNumber: 1,
 }
 // perhaps update this to also include the other values from the TextItem
 export type TextScores = TextScore[]
