@@ -5,6 +5,11 @@
  *
  */
 
+/*
+ * updates by Resume Redactor Author: import TextItem to ensure
+ * ResumeProfile and ResumeEducation had TextItem type
+ */
+
 import type { TextItem } from 'lib/parse-resume-from-pdf/types'
 export interface ResumeProfile {
   name: TextItem
@@ -23,10 +28,10 @@ export interface ResumeWorkExperience {
 }
 
 export interface ResumeEducation {
-  school: string
-  degree: string
-  date: string
-  gpa: string
+  school: TextItem
+  degree: TextItem
+  date: TextItem
+  gpa: TextItem
   descriptions: string[]
 }
 

@@ -10,7 +10,6 @@ import type {
 } from 'lib/parse-resume-from-pdf/types'
 import type { ResumeEducation } from 'lib/redux/types'
 import { getSectionLinesByKeywords } from 'lib/parse-resume-from-pdf/extract-resume-from-sections/lib/get-section-lines'
-import { divideSectionIntoSubsections } from 'lib/parse-resume-from-pdf/extract-resume-from-sections/lib/subsections'
 import {
   DATE_FEATURE_SETS,
   hasComma,
@@ -67,17 +66,54 @@ const GPA_FEATURE_SETS: FeatureSet[] = [
   [hasLetter, -4],
 ]
 
+/*
+ *  divideEducationIntoSubsections added by Resume Redactor Author
+ *  to improve the recognition of schools within resume
+ */
+
+type TextLine = TextItem[] // One line of text items
+type EducationSubsection = TextLine[] // Multiple lines forming one education entry
+type EducationSubsections = EducationSubsection[] // All education entries
+
+const divideEducationIntoSubsections = (
+  lines: TextLine[]
+): EducationSubsections => {
+  const subsections: EducationSubsections = []
+  let currentSubsection: EducationSubsection = []
+
+  lines.forEach((line, index) => {
+    // Check if ANY item in this line has a school keyword
+    const lineHasSchool = line.some((item) => hasSchool(item))
+
+    if (lineHasSchool && index > 0 && currentSubsection.length > 0) {
+      subsections.push([...currentSubsection])
+      currentSubsection = [line]
+    } else {
+      currentSubsection.push(line)
+    }
+  })
+
+  // Add the last subsection
+  if (currentSubsection.length > 0) {
+    subsections.push(currentSubsection)
+  }
+
+  return subsections
+}
+
 export const extractEducation = (sections: ResumeSectionToLines) => {
   const educations: ResumeEducation[] = []
   const educationsScores = []
   const lines = getSectionLinesByKeywords(sections, ['education'])
-  const subsections = divideSectionIntoSubsections(lines)
+  const subsections = divideEducationIntoSubsections(lines)
   for (const subsectionLines of subsections) {
     const textItems = subsectionLines.flat()
+    console.log('textItems for education,', textItems)
     const [school, schoolScores] = getTextWithHighestFeatureScore(
       textItems,
       SCHOOL_FEATURE_SETS
     )
+    console.log('School:', school, 'School Scores:', schoolScores)
     const [degree, degreeScores] = getTextWithHighestFeatureScore(
       textItems,
       DEGREE_FEATURE_SETS

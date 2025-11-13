@@ -13,6 +13,7 @@ export async function modifyPdf(
   const url = pdfURL
   const resume = await parseResumeFromPdf(pdfURL)
   console.log('Parsed resume from resume modifier:', resume.profile)
+  console.log('educations listed:', resume.educations)
   const existingPdfBytes = await fetch(url).then((res) => res.arrayBuffer())
 
   const pdfDoc = await PDFDocument.load(existingPdfBytes)
@@ -45,6 +46,30 @@ export async function modifyPdf(
       })
     }
   })
+
+  resume.educations.forEach((education, index) => {
+    const educationFields: RedactionFieldConfig[] = [
+      { key: 'graduation_date', data: education.date },
+      { key: 'degree', data: education.degree },
+      { key: 'gpa', data: education.gpa },
+      { key: 'school', data: education.school },
+    ]
+
+    educationFields.forEach((field) => {
+      if (redactionFieldsRequested[field.key as keyof RedactionFields]) {
+        addRedactedField({
+          form,
+          fieldName: `${field.key}_${index}`,
+          page: firstPage,
+          fieldData: field.data,
+          font: helveticaFont,
+          textBottomOffset: -4,
+          heightOffset: 2,
+        })
+      }
+    })
+  })
+
   const pdfBytes = await pdfDoc.save()
   const arrayBuffer =
     pdfBytes.buffer instanceof ArrayBuffer

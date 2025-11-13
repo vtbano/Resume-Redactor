@@ -25,7 +25,6 @@ export const extractResumeFromSections = (
   sections: ResumeSectionToLines
 ): Resume => {
   const { profile } = extractProfile(sections)
-  console.log('profile from extractResumeFromSections:', profile)
   const { educations } = extractEducation(sections)
 
   return {
