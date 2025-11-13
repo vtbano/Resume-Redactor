@@ -28,7 +28,7 @@ export async function modifyPdf(
     { key: 'name', data: resume.profile.name },
     { key: 'email', data: resume.profile.email },
     { key: 'phone', data: resume.profile.phone },
-    { key: 'location', data: resume.profile.location },
+    { key: 'address', data: resume.profile.location },
     { key: 'url', data: resume.profile.url },
   ]
 

@@ -21,15 +21,19 @@ export default function Home() {
     name: false,
     email: false,
     phone: false,
-    location: false,
+    address: false,
     url: false,
+    graduation_date: false,
+    degree: false,
+    gpa: false,
+    school: false,
   })
 
   const redactionOptions = (
     Object.keys(redactionFields) as (keyof RedactionFields)[]
   ).map((key) => ({
     value: key,
-    label: key,
+    label: key.toUpperCase().replace(/_/g, ' '),
   }))
 
   const createRedactionFieldsFromSelected = (
@@ -46,15 +50,13 @@ export default function Home() {
   const handleRedactionChange = (
     selectedOptions: MultiValue<{
       value: keyof RedactionFields
-      label: keyof RedactionFields
+      label: string
     }>
   ) => {
     const selected = selectedOptions
       ? selectedOptions.map(
-          (option: {
-            value: keyof RedactionFields
-            label: keyof RedactionFields
-          }) => option.value
+          (option: { value: keyof RedactionFields; label: string }) =>
+            option.value
         )
       : []
 
