@@ -148,12 +148,14 @@ export default function Home() {
             className="min-w-[300px]"
           />
 
-          <Button type="button" onClick={handleModifyPdf} className="mr-4">
-            Modify PDF
-          </Button>
-          {modifiedDoc && fileUrl === defaultResumeExampleUrl && (
-            <Button onClick={onReset}>Clear Example</Button>
-          )}
+          <div>
+            <Button type="button" onClick={handleModifyPdf} className="mr-4">
+              Modify PDF
+            </Button>
+            {modifiedDoc && fileUrl === defaultResumeExampleUrl && (
+              <Button onClick={onReset}>Clear Example</Button>
+            )}
+          </div>
         </div>
       </div>
 
