@@ -15,6 +15,7 @@ import {
   hasLetter,
   hasLetterAndIsAllUpperCase,
 } from 'lib/parse-resume-from-pdf/extract-resume-from-sections/lib/common-features'
+import { VALID_LOCATIONS } from './lib/constants-locations'
 import { getTextWithHighestFeatureScore } from 'lib/parse-resume-from-pdf/extract-resume-from-sections/lib/feature-scoring-system'
 
 // Name
@@ -32,10 +33,18 @@ export const matchPhone = (item: TextItem) =>
   item.text.match(/\(?\d{3}\)?[\s-]?\d{3}[\s-]?\d{4}/)
 const hasParenthesis = (item: TextItem) => /\([0-9]+\)/.test(item.text)
 
+/*
+ *  Refactor matchCityAndState by Resume Redactor Author
+ *  to improve the match with state/provinces respectively US/Canada
+ */
+
 // Location
-// Simple location regex that matches "<City>, <ST>"
-export const matchCityAndState = (item: TextItem) =>
-  item.text.match(/[A-Z][a-zA-Z\s]+, [A-Z]{2}/)
+// Validates against actual state/province names
+export const matchCityAndState = (item: TextItem) => {
+  const match = item.text.match(/\b([A-Z][a-zA-Z\s]+),\s([A-Z][a-zA-Z\s]+)\b/)
+
+  return match && VALID_LOCATIONS.includes(match[2].trim()) ? match : null
+}
 
 // Url
 // Simple url regex that matches "xxx.xxx/xxx" (xxx = anything not space)
