@@ -81,6 +81,8 @@ export default function Home() {
     setRedactionFields(createRedactionFieldsFromSelected([]))
   }
 
+  const hasSelectedFields = Object.values(redactionFields).some(Boolean)
+
   const handleModifyPdf = async () => {
     try {
       setLoading(true)
@@ -118,7 +120,6 @@ export default function Home() {
           />
         </div>
         <div className="flex flex-col gap-3 mt-6 items-center">
-          <label className="mr-2">Select Fields to Redact</label>
           <div className="flex gap-2 mb-2">
             <Button
               type="button"
@@ -145,14 +146,23 @@ export default function Home() {
               (option) => redactionFields[option.value]
             )}
             onChange={handleRedactionChange}
-            placeholder="Options"
+            placeholder="Redaction Field Options"
             className="min-w-[300px]"
           />
+          <div>
+            {!hasSelectedFields && (
+              <p className="text-gray-500 text-sm mt-1">
+                Select at least one field to enable PDF modification
+              </p>
+            )}
+          </div>
 
           <div>
-            <Button type="button" onClick={handleModifyPdf} className="mr-4">
-              Modify PDF
-            </Button>
+            {hasSelectedFields && (
+              <Button type="button" onClick={handleModifyPdf} className="mr-4">
+                Modify PDF
+              </Button>
+            )}
             {modifiedDoc && fileUrl === defaultResumeExampleUrl && (
               <Button onClick={onReset}>Clear Example</Button>
             )}
