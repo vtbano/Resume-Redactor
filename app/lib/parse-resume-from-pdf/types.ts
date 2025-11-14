@@ -42,6 +42,7 @@ export interface TextScore {
   height: number
   fontName: string
   hasEOL: boolean
+  pageNumber: number
   score: number
   match: boolean
 }

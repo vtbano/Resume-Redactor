@@ -108,12 +108,10 @@ export const extractEducation = (sections: ResumeSectionToLines) => {
   const subsections = divideEducationIntoSubsections(lines)
   for (const subsectionLines of subsections) {
     const textItems = subsectionLines.flat()
-    console.log('textItems for education,', textItems)
     const [school, schoolScores] = getTextWithHighestFeatureScore(
       textItems,
       SCHOOL_FEATURE_SETS
     )
-    console.log('School:', school, 'School Scores:', schoolScores)
     const [degree, degreeScores] = getTextWithHighestFeatureScore(
       textItems,
       DEGREE_FEATURE_SETS

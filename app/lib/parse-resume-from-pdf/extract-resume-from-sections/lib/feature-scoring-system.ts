@@ -23,6 +23,7 @@ const computeFeatureScores = (
     height: item.height,
     fontName: item.fontName,
     hasEOL: item.hasEOL,
+    pageNumber: item.pageNumber,
     score: 0,
     match: false,
   }))
@@ -54,6 +55,7 @@ const computeFeatureScores = (
             height: textItem.height,
             fontName: textItem.fontName,
             hasEOL: textItem.hasEOL,
+            pageNumber: textItem.pageNumber,
             score,
             match: true,
           })
@@ -89,6 +91,7 @@ export const getTextWithHighestFeatureScore = (
     height,
     fontName,
     hasEOL,
+    pageNumber,
   } of textScores) {
     if (score >= highestScore) {
       if (score > highestScore) {
@@ -100,6 +103,7 @@ export const getTextWithHighestFeatureScore = (
           height,
           fontName,
           hasEOL,
+          pageNumber,
         }
         highestScore = score
       }

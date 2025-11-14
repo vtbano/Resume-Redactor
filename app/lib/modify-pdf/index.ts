@@ -22,8 +22,6 @@ export async function modifyPdf(
   const form = pdfDoc.getForm()
 
   const pages = pdfDoc.getPages()
-  console.log('PAGES', pages)
-  const firstPage = pages[0]
 
   const fields: RedactionFieldConfig[] = [
     { key: 'name', data: resume.profile.name },
@@ -38,7 +36,7 @@ export async function modifyPdf(
       addRedactedField({
         form,
         fieldName: field.key,
-        page: firstPage,
+        page: pages[field.data.pageNumber - 1],
         fieldData: field.data,
         font: helveticaFont,
         textBottomOffset: -4,
@@ -60,7 +58,7 @@ export async function modifyPdf(
         addRedactedField({
           form,
           fieldName: `${field.key}_${index}`,
-          page: firstPage,
+          page: pages[field.data.pageNumber - 1],
           fieldData: field.data,
           font: helveticaFont,
           textBottomOffset: -4,

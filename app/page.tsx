@@ -138,6 +138,7 @@ export default function Home() {
             </Button>
           </div>
           <Select
+            instanceId="redaction-select"
             isMulti
             options={redactionOptions}
             value={redactionOptions.filter(
