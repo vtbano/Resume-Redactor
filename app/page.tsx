@@ -62,14 +62,6 @@ export default function Home() {
 
     console.log('selected', selected)
     setRedactionFields(createRedactionFieldsFromSelected(selected))
-
-    // setRedactionFields({
-    //   name: selected.includes('name'),
-    //   email: selected.includes('email'),
-    //   phone: selected.includes('phone'),
-    //   location: selected.includes('location'),
-    //   url: selected.includes('url'),
-    // })
   }
 
   const handleSelectAll = () => {
@@ -156,15 +148,11 @@ export default function Home() {
               </p>
             )}
           </div>
-
           <div>
             {hasSelectedFields && (
               <Button type="button" onClick={handleModifyPdf} className="mr-4">
                 Modify PDF
               </Button>
-            )}
-            {modifiedDoc && fileUrl === defaultResumeExampleUrl && (
-              <Button onClick={onReset}>Clear Example</Button>
             )}
           </div>
         </div>

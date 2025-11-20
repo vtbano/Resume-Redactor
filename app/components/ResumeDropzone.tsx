@@ -1,7 +1,6 @@
 import { useState, useRef } from 'react'
 import { LockClosedIcon } from '@heroicons/react/24/solid'
 import { XMarkIcon } from '@heroicons/react/24/outline'
-import Image from 'next/image'
 import { cx } from 'lib/utils/cx'
 
 const defaultFileState = {
@@ -35,6 +34,7 @@ export const ResumeDropzone = ({
     const fileUrl = URL.createObjectURL(newFile)
     setFile({ name, size, fileUrl })
     onFileUrlChange(fileUrl)
+    setModifiedDoc('')
   }
 
   const onDrop = (event: React.DragEvent<HTMLDivElement>) => {

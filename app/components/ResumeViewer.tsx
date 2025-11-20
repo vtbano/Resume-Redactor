@@ -6,10 +6,14 @@ export const ResumeViewer = ({
   documentName?: string
 }) => {
   return (
-    <div className="w-full sm:w-[800px] h-[900px] lg: mb-8">
+    <div className="w-full max-w-[800px] mb-8">
       <h2 className="text-xl font-bold mb-2">{documentName}</h2>
-      <div className="scale-[0.85] origin-top-left sm:scale-100">
-        <iframe src={`${pdfURL}#navpanes=0`} className="h-[900px] w-[800px]" />
+      {/* FIXED: Make container and iframe truly responsive */}
+      <div className="w-full aspect-[8/9] bg-gray-100 rounded border">
+        <iframe
+          src={`${pdfURL}#navpanes=0&zoom=page-width`}
+          className="w-full h-full rounded"
+        />
       </div>
     </div>
   )
