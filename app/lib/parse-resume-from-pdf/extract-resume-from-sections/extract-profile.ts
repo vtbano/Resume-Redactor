@@ -17,6 +17,7 @@ import {
 } from 'lib/parse-resume-from-pdf/extract-resume-from-sections/lib/common-features'
 import { VALID_LOCATIONS } from './lib/constants-locations'
 import { getTextWithHighestFeatureScore } from 'lib/parse-resume-from-pdf/extract-resume-from-sections/lib/feature-scoring-system'
+import { fixExtractedItemCoordinates } from './lib/fix-item-coordinates'
 
 // Name
 export const matchOnlyLetterSpaceOrPeriod = (item: TextItem) =>
@@ -164,6 +165,13 @@ export const extractProfile = (sections: ResumeSectionToLines) => {
     undefined,
     true
   )
+
+  fixExtractedItemCoordinates(textItems, {
+    name,
+    email,
+    phone,
+    location,
+  })
 
   const summaryLines = getSectionLinesByKeywords(sections, ['summary'])
   const summarySection = summaryLines

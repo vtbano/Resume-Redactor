@@ -21,6 +21,7 @@ import {
   getBulletPointsFromLines,
   getDescriptionsLineIdx,
 } from 'lib/parse-resume-from-pdf/extract-resume-from-sections/lib/bullet-points'
+import { fixExtractedItemCoordinates } from './lib/extracted-item-coordinates'
 
 /**
  *              Unique Attribute
@@ -124,6 +125,13 @@ export const extractEducation = (sections: ResumeSectionToLines) => {
       textItems,
       DATE_FEATURE_SETS
     )
+
+    fixExtractedItemCoordinates(textItems, {
+      school: school,
+      degree: degree,
+      gpa: gpa,
+      date: date,
+    })
 
     let descriptions: string[] = []
     const descriptionsLineIdx = getDescriptionsLineIdx(subsectionLines)
