@@ -30,7 +30,51 @@ const SEASONS = ['Summer', 'Fall', 'Spring', 'Winter']
 const hasSeason = (item: TextItem) =>
   SEASONS.some((season) => item.text.includes(season))
 const hasPresent = (item: TextItem) => item.text.includes('Present')
+
+/*
+ *  hasGraduation & extractDatePatterns added by Resume Redactor Author
+ *  to improve redaction of graduation date.
+ */
+const hasGraduation = (item: TextItem) =>
+  item.text.includes('Graduation') || item.text.includes('Graduated')
+
+const extractDatePatterns = (item: TextItem) => {
+  const patterns = [
+    // Month Year ranges
+    /\b(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.?\s+\d{4}\s*[-–—]\s*(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.?\s+\d{4}/i,
+
+    // Year ranges
+    /\b\d{4}\s*[-–—]\s*\d{4}\b/,
+
+    // Date to Present
+    /\b(?:(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.?\s+)?\d{4}\s*[-–—]\s*Present\b/i,
+
+    // Month Year
+    /\b(January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\.?\s+\d{4}\b/i,
+
+    // Just Present
+    /\bPresent\b/i,
+
+    // FIXED: Year only - return just the year, not "Graduated: YEAR"
+    /(?:Graduated?:?\s*)?(\d{4})(?=[A-Z]|$|\s)/i,
+  ]
+
+  for (let i = 0; i < patterns.length; i++) {
+    const match = item.text.match(patterns[i])
+    if (match) {
+      if (i === patterns.length - 1 && match[1]) {
+        return [match[1]] as RegExpMatchArray
+      } else {
+        return [match[0]] as RegExpMatchArray
+      }
+    }
+  }
+
+  return null
+}
 export const DATE_FEATURE_SETS: FeatureSet[] = [
+  [extractDatePatterns, 4, true],
+  [hasGraduation, 2],
   [hasYear, 1],
   [hasMonth, 1],
   [hasSeason, 1],

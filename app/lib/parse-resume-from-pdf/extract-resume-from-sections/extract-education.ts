@@ -21,19 +21,35 @@ import {
   getBulletPointsFromLines,
   getDescriptionsLineIdx,
 } from 'lib/parse-resume-from-pdf/extract-resume-from-sections/lib/bullet-points'
-import { fixExtractedItemCoordinates } from './lib/extracted-item-coordinates'
+import { fixExtractedItemCoordinates } from './lib/fix-item-coordinates'
 
-/**
- *              Unique Attribute
- * School       Has school
- * Degree       Has degree
- * GPA          Has number
+/*
+ *  extraction functions for school and degree added by Resume Redactor Author
+ *  to improve redaction of school name and degree.
  */
 
 // prettier-ignore
 const SCHOOLS = ['College', 'University', 'Institute', 'School', 'Academy', 'BASIS', 'Magnet']
 const hasSchool = (item: TextItem) =>
   SCHOOLS.some((school) => item.text.includes(school))
+
+const extractSchoolName = (item: TextItem) => {
+  const schoolPatterns = [
+    // Pattern: "School Name University" or "School Name College"
+    /([A-Z][a-zA-Z\s&.-]+(?:University|College|Institute|School|Academy|BASIS|Magnet))/,
+
+    // Pattern: "University of School Name"
+    /((?:University|College|Institute|School|Academy)\s+of\s+[A-Z][a-zA-Z\s&.-]+)/,
+  ]
+
+  for (const pattern of schoolPatterns) {
+    const match = item.text.match(pattern)
+    if (match) {
+      return [match[1].trim()] as RegExpMatchArray
+    }
+  }
+  return null
+}
 // prettier-ignore
 const DEGREES = ["Associate", "Bachelor", "Master", "PhD", "Ph."];
 const hasDegree = (item: TextItem) =>
@@ -48,14 +64,48 @@ const matchGrade = (item: TextItem) => {
   return null
 }
 
+const extractDegreeName = (item: TextItem) => {
+  const degreePatterns = [
+    // Full degree names with various separators
+    /((?:Associate|Bachelor|Master|PhD|Ph\.D\.)\s+(?:of\s+)?[A-Za-z\s&,.-]*?)(?:\s+(?:Graduated:?|GPA|\||–|—|\)|,|-)|$)/i,
+
+    // Handle degrees in parentheses like "(Curatorial Studies)"
+    /((?:Associate|Bachelor|Master|PhD|Ph\.D\.)\s+(?:of\s+)?[A-Za-z\s&,.-]*?\([A-Za-z\s&,.-]*?\))/i,
+
+    // Handle degrees followed by dash and other content
+    /((?:Associate|Bachelor|Master|PhD|Ph\.D\.)\s+(?:of\s+)?[A-Za-z\s&,.-]*?)\s+-\s+/i,
+
+    // Abbreviated degrees: "B.S.", "M.A.", "MBA", etc.
+    /\b([ABM][A-Z\.]{1,4})\b/,
+
+    // PhD variations
+    /(Ph\.?D\.?(?:\s+in\s+[A-Za-z\s&,.-]*?)?)/i,
+  ]
+
+  for (const pattern of degreePatterns) {
+    const match = item.text.match(pattern)
+    if (match) {
+      console.log(
+        `Degree extraction matched: "${match[1].trim()}" from "${item.text}"`
+      )
+      return [match[1].trim()] as RegExpMatchArray
+    }
+  }
+
+  console.log(`No degree pattern matched in: "${item.text}"`)
+  return null
+}
+
 const SCHOOL_FEATURE_SETS: FeatureSet[] = [
-  [hasSchool, 4],
+  [extractSchoolName, 4, true],
+  [hasSchool, 3],
   [hasDegree, -4],
   [hasNumber, -4],
 ]
 
 const DEGREE_FEATURE_SETS: FeatureSet[] = [
-  [hasDegree, 4],
+  [extractDegreeName, 4, true],
+  [hasDegree, 3],
   [hasSchool, -4],
   [hasNumber, -3],
 ]
