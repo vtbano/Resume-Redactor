@@ -85,14 +85,10 @@ const extractDegreeName = (item: TextItem) => {
   for (const pattern of degreePatterns) {
     const match = item.text.match(pattern)
     if (match) {
-      console.log(
-        `Degree extraction matched: "${match[1].trim()}" from "${item.text}"`
-      )
       return [match[1].trim()] as RegExpMatchArray
     }
   }
 
-  console.log(`No degree pattern matched in: "${item.text}"`)
   return null
 }
 

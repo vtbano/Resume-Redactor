@@ -1,4 +1,8 @@
 export const VALID_LOCATIONS = [
+  //Country
+  'Canada',
+  'United States',
+  'USA',
   // US States (abbreviated)
   'AL',
   'AK',

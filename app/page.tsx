@@ -89,11 +89,6 @@ export default function Home() {
     }
   }
 
-  const onReset = () => {
-    setModifiedDoc('')
-    setFileUrl(defaultResumeExampleUrl)
-  }
-
   return (
     <div className="flex flex-col items-center min-h-screen font-sans p-8 pb-20 gap-16 sm:p-20">
       <div className="w-full max-w-[1600px] mx-auto items-center text-center">
