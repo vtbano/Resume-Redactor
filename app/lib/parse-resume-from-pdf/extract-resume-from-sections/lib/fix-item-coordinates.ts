@@ -5,36 +5,46 @@ import type { TextItem } from 'lib/parse-resume-from-pdf/types'
  * @param textItems - Array of all text items to search through
  * @param extractedFields - Object containing extracted TextItem fields to fix
  */
+
 export function fixExtractedItemCoordinates(
   textItems: TextItem[],
   extractedFields: Record<string, TextItem | null | undefined>
-) {
-  textItems.forEach((item) => {
-    const fieldsToFix = Object.entries(extractedFields)
-      .filter(([_, textItem]) => textItem && item.text.includes(textItem.text))
-      .map(([key, textItem]) => ({ key, textItem: textItem! }))
+): Record<string, TextItem> {
+  // start with only the present fields (filter out null/undefined)
+  const updated: Record<string, TextItem> = {}
+  for (const [key, field] of Object.entries(extractedFields)) {
+    if (field && field.text) {
+      updated[key] = { ...field }
+    }
+  }
 
-    if (fieldsToFix.length > 0) {
-      const actualCharWidth = item.width / item.text.length
+  for (const item of textItems) {
+    if (!item.text) {
+      // skip empty items
+    } else {
+      const charWidth = item.text.length ? item.width / item.text.length : 0
 
-      fieldsToFix.forEach((field) => {
-        if (item.text !== field.textItem.text) {
-          const textIndex = item.text.indexOf(field.textItem.text)
-          if (textIndex !== -1) {
-            const calculatedPosition = item.x + textIndex * actualCharWidth
-            const positionCorrection = actualCharWidth // Account for font rendering differences
-            const newX = calculatedPosition - positionCorrection
+      for (const [key, field] of Object.entries(updated)) {
+        // only attempt correction when the candidate is a substring of a larger item
+        if (item.text !== field.text) {
+          const idx = item.text.indexOf(field.text)
+          if (idx !== -1) {
+            const calculatedPosition = item.x + idx * charWidth
+            const leftCorrection = Math.max(charWidth * 0.5, 0)
+            const paddingBuffer = Math.max(charWidth * 1.2, 0)
 
-            const paddingBuffer = 1.2 // Extra padding for better coverage
-            const bulletPadding = actualCharWidth * paddingBuffer
-            const newWidth =
-              field.textItem.text.length * actualCharWidth + bulletPadding
+            const newX = calculatedPosition - leftCorrection
+            const newWidth = Math.max(
+              field.text.length * charWidth + paddingBuffer,
+              0
+            )
 
-            field.textItem.x = newX
-            field.textItem.width = newWidth
+            updated[key] = { ...field, x: newX, width: newWidth }
           }
         }
-      })
+      }
     }
-  })
+  }
+
+  return updated
 }

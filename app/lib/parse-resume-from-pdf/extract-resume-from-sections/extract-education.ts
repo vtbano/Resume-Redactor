@@ -172,12 +172,24 @@ export const extractEducation = (sections: ResumeSectionToLines) => {
       DATE_FEATURE_SETS
     )
 
-    fixExtractedItemCoordinates(textItems, {
-      school: school,
-      degree: degree,
-      gpa: gpa,
-      date: date,
+    const updatedFields = fixExtractedItemCoordinates(textItems, {
+      school,
+      degree,
+      gpa,
+      date,
     })
+
+    const {
+      school: updatedSchool,
+      degree: updatedDegree,
+      gpa: updatedGpa,
+      date: updatedDate,
+    } = updatedFields
+
+    const schoolItem = updatedSchool ?? school
+    const degreeItem = updatedDegree ?? degree
+    const gpaItem = updatedGpa ?? gpa
+    const dateItem = updatedDate ?? date
 
     let descriptions: string[] = []
     const descriptionsLineIdx = getDescriptionsLineIdx(subsectionLines)
@@ -186,7 +198,13 @@ export const extractEducation = (sections: ResumeSectionToLines) => {
       descriptions = getBulletPointsFromLines(descriptionsLines)
     }
 
-    educations.push({ school, degree, gpa, date, descriptions })
+    educations.push({
+      school: schoolItem,
+      degree: degreeItem,
+      gpa: gpaItem,
+      date: dateItem,
+      descriptions,
+    })
     educationsScores.push({
       schoolScores,
       degreeScores,

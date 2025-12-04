@@ -38,13 +38,63 @@ const hasParenthesis = (item: TextItem) => /\([0-9]+\)/.test(item.text)
  *  Refactor matchCityAndState by Resume Redactor Author
  *  to improve the match with state/provinces respectively US/Canada
  */
-
 // Location
 // Validates against actual state/province names
-export const matchCityAndState = (item: TextItem) => {
-  const match = item.text.match(/\b([A-Z][a-zA-Z\s]+),\s([A-Z][a-zA-Z\s]+)\b/)
+const normalize = (s: string) => s.replace(/\./g, '').trim().toLowerCase()
 
-  return match && VALID_LOCATIONS.includes(match[2].trim()) ? match : null
+const VALID_SET = new Set(VALID_LOCATIONS.map(normalize))
+
+const cleanContactLine = (orig: string) =>
+  orig.replace(/\|/g, ',').replace(/(^|[\s,;:|])n(?=[A-Za-z])/g, '$1')
+
+const splitParts = (cleaned: string) =>
+  cleaned
+    .split(',')
+    .map((p) => p.trim())
+    .filter(Boolean)
+
+const buildLocationMatch = (
+  cleaned: string,
+  parts: string[],
+  idx: number,
+  orig: string
+): RegExpMatchArray => {
+  const token = parts[idx]
+  const city = idx > 0 ? parts[idx - 1] : undefined
+  const country = idx + 1 < parts.length ? parts[idx + 1] : undefined
+
+  const pieces: string[] = []
+  if (city) pieces.push(city)
+  pieces.push(token)
+  if (country && VALID_SET.has(normalize(country))) pieces.push(country)
+
+  const substring = pieces.join(', ')
+  const idxPos = cleaned.indexOf(substring)
+  const match =
+    pieces.length === 3
+      ? ([substring, city || '', token, country] as unknown as RegExpMatchArray)
+      : ([substring, city || '', token] as unknown as RegExpMatchArray)
+
+  match.index = idxPos >= 0 ? idxPos : cleaned.indexOf(token)
+  match.input = orig
+  return match
+}
+
+export const matchCityAndState = (item: TextItem) => {
+  const orig = item.text || ''
+  if (!orig.trim()) return null
+
+  const cleaned = cleanContactLine(orig)
+  const parts = splitParts(cleaned)
+
+  const idx = parts.findIndex((part) => VALID_SET.has(normalize(part)))
+  if (idx === -1) {
+    return null
+  }
+
+  const match = buildLocationMatch(cleaned, parts, idx, orig)
+  console.log(match)
+  return match
 }
 
 // Url
@@ -166,12 +216,17 @@ export const extractProfile = (sections: ResumeSectionToLines) => {
     true
   )
 
-  fixExtractedItemCoordinates(textItems, {
+  const updatedFields = fixExtractedItemCoordinates(textItems, {
     name,
     email,
     phone,
     location,
   })
+
+  const updatedName = updatedFields.name ?? name
+  const updatedEmail = updatedFields.email ?? email
+  const updatedPhone = updatedFields.phone ?? phone
+  const updatedLocation = updatedFields.location ?? location
 
   const summaryLines = getSectionLinesByKeywords(sections, ['summary'])
   const summarySection = summaryLines
@@ -186,15 +241,13 @@ export const extractProfile = (sections: ResumeSectionToLines) => {
 
   return {
     profile: {
-      name,
-      email,
-      phone,
-      location,
+      name: updatedName,
+      email: updatedEmail,
+      phone: updatedPhone,
+      location: updatedLocation,
       url,
-      // Dedicated section takes higher precedence over profile summary
       summary: summarySection || objectiveSection || summary,
     },
-    // For debugging
     profileScores: {
       name: nameScores,
       email: emailScores,
