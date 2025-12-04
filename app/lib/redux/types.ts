@@ -11,6 +11,15 @@
  */
 
 import type { TextItem } from 'lib/parse-resume-from-pdf/types'
+
+export interface ResumeSliceProfile {
+  name: string
+  email: string
+  phone: string
+  url: string
+  summary: string
+  location: string
+}
 export interface ResumeProfile {
   name: TextItem
   email: TextItem
@@ -20,13 +29,14 @@ export interface ResumeProfile {
   location: TextItem
 }
 
-export interface ResumeWorkExperience {
-  company: string
-  jobTitle: string
+
+export interface ResumeSliceEducation {
+  school: string
+  degree: string
   date: string
+  gpa: string
   descriptions: string[]
 }
-
 export interface ResumeEducation {
   school: TextItem
   degree: TextItem
@@ -35,11 +45,6 @@ export interface ResumeEducation {
   descriptions: string[]
 }
 
-export interface ResumeProject {
-  project: string
-  date: string
-  descriptions: string[]
-}
 
 export interface FeaturedSkill {
   skill: string
@@ -53,6 +58,12 @@ export interface ResumeSkills {
 
 export interface ResumeCustom {
   descriptions: string[]
+}
+
+export interface InitialResume {
+  profile: ResumeSliceProfile
+  educations: ResumeSliceEducation[]
+  custom: ResumeCustom
 }
 
 export interface Resume {

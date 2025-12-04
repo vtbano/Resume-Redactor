@@ -11,23 +11,18 @@ export interface Settings {
   fontSize: string
   documentSize: string
   formToShow: {
-    workExperiences: boolean
     educations: boolean
-    projects: boolean
     skills: boolean
     custom: boolean
   }
   formToHeading: {
-    workExperiences: string
     educations: string
-    projects: string
     skills: string
     custom: string
   }
   formsOrder: ShowForm[]
   showBulletPoints: {
     educations: boolean
-    projects: boolean
     skills: boolean
     custom: boolean
   }
@@ -51,23 +46,21 @@ export const initialSettings: Settings = {
   fontSize: DEFAULT_FONT_SIZE,
   documentSize: 'Letter',
   formToShow: {
-    workExperiences: true,
     educations: true,
-    projects: true,
+
     skills: true,
     custom: false,
   },
   formToHeading: {
-    workExperiences: 'WORK EXPERIENCE',
     educations: 'EDUCATION',
-    projects: 'PROJECT',
+
     skills: 'SKILLS',
     custom: 'CUSTOM SECTION',
   },
-  formsOrder: ['workExperiences', 'educations', 'projects', 'skills', 'custom'],
+  formsOrder: ['educations', 'skills', 'custom'],
   showBulletPoints: {
     educations: true,
-    projects: true,
+
     skills: true,
     custom: true,
   },
