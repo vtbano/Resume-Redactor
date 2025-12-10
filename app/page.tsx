@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Select from 'react-select'
+import type { StylesConfig } from 'react-select'
 import { MultiValue } from 'react-select'
 import Image from 'next/image'
 import { ResumeDropzone } from './components/ResumeDropzone'
@@ -11,6 +12,8 @@ import { modifyPdf } from 'lib/modify-pdf'
 import { RedactionFields } from 'lib/modify-pdf/types'
 
 const defaultResumeExampleUrl = 'resume-example/openresume-resume.pdf'
+
+type Option = { value: keyof RedactionFields; label: string }
 
 export default function Home() {
   const [fileUrl, setFileUrl] = useState(defaultResumeExampleUrl)
@@ -89,16 +92,39 @@ export default function Home() {
     }
   }
 
+  const selectStyles: StylesConfig<Option, true> = {
+    control: (provided, state) => ({
+      ...provided,
+      borderColor: state.isFocused ? '#14B8A6' : provided.borderColor,
+      boxShadow: state.isFocused ? '0 0 0 1px #14B8A6' : provided.boxShadow,
+      '&:hover': { borderColor: '#14B8A6' },
+    }),
+    option: (provided, state) => ({
+      ...provided,
+      backgroundColor: state.isFocused ? '#E6FFFA' : provided.backgroundColor,
+    }),
+  }
+
   return (
     <div className="flex flex-col items-center min-h-screen font-sans p-8 pb-20 gap-16 sm:p-20">
-      <div className="w-full max-w-[1600px] mx-auto items-center text-center">
-        <h1 className="text-4xl font-bold">Resume Redactor</h1>
-        <p className="max-w-[700px]">
-          Welcome to Resume Redactor. A tool that helps you redact personal
-          information from resumes.
-        </p>
+      <div className="w-full max-w-[1600px] mx-auto flex flex-col items-center text-center">
+        <div className="flex items-center">
+          <h1 className="text-4xl font-bold text-teal-500">Resume Redactor</h1>
+          <Image
+            src="/resume-redact-image.png"
+            alt="Redaction Icon"
+            width={80}
+            height={80}
+            className="block"
+          />
+        </div>
 
-        <div className="mt-3 mx-auto w-full max-w-[1600px]">
+        <div className="p-3 max-w-[700px]">
+          A tool that helps you redact personal information from resumes. Made
+          for HR professionals in mind by a former Talent Leader.
+        </div>
+
+        <div className="mt-3 mx-auto w-full max-w-[800px]">
           <ResumeDropzone
             onFileUrlChange={(fileUrl) =>
               setFileUrl(fileUrl || defaultResumeExampleUrl)
@@ -135,6 +161,7 @@ export default function Home() {
             onChange={handleRedactionChange}
             placeholder="Redaction Field Options"
             className="min-w-[300px]"
+            styles={selectStyles}
           />
           <div>
             {!hasSelectedFields && (
@@ -177,6 +204,72 @@ export default function Home() {
           error={error}
         />
       </main>
+      <section>
+        <div className="flex">
+          <Image
+            src="/story.png"
+            alt="Review icon"
+            width={300}
+            height={300}
+            className="hidden md:block flex-shrink-0 object-contain"
+          />
+          <div className="max-w-[500px]">
+            <h2 className="font-bold text-teal-500">App Inspo</h2>
+            <p>
+              This tool was inspired by its creator’s experience as a Talent
+              Leader, someone who deeply understands the friction of blind
+              screening without built-in ATS redaction. While most tracking
+              systems require tedious manual redaction line-by-line, this tool
+              automates profile and education redaction, removing the manual
+              burden and dramatically speeding up the process.
+            </p>
+          </div>
+        </div>
+        <div className="flex pt-5">
+          <div>
+            <h2 className="font-bold text-teal-500">
+              Stay tuned for upgrades...
+            </h2>
+            <div className="max-w-[500px]">
+              <a
+                className="flex items-center gap-2 hover:underline hover:underline-offset-4 font-bold text-teal-500"
+                href="https://github.com/vtbano/Resume-Redactor/issues/1"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                API
+              </a>
+              <p>
+                This upcoming addition is intended to improve the flow of the
+                redaction process, by allowing the ATS to plug-in and utilize
+                the redaction features for free!
+              </p>
+              <a
+                className="flex items-center gap-2 hover:underline hover:underline-offset-4 font-bold text-teal-500"
+                href="https://github.com/vtbano/Resume-Redactor/issues/2"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Batch Redaction
+              </a>
+              <p>
+                This upcoming feature will take the redaction tool to the next
+                level, by allowing the recruiter to batch redact! There are
+                typically a few resumes that are part of the screening process,
+                so being able to redact all at once will shave off a lot of time
+                from the day-to-day recruitment process.
+              </p>
+            </div>
+          </div>
+          <Image
+            src="/ideas.png"
+            alt="Review icon"
+            width={300}
+            height={300}
+            className="hidden md:block flex-shrink-0 object-contain"
+          />
+        </div>
+      </section>
 
       {/* FOOTER */}
       <footer className="mt-auto flex gap-6 flex-wrap items-center justify-center border-t border-gray-200 p-6">
