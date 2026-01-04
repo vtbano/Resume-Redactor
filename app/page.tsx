@@ -8,7 +8,9 @@ import { ResumeDropzone } from './components/ResumeDropzone'
 import { ModifiedResumeViewer } from 'components/ModifiedResumeViewer'
 import { ResumeViewer } from 'components/ResumeViewer'
 import Button from 'components/Button'
+import CustomWordRedaction from 'components/CustomWordRedaction'
 import { modifyPdf } from 'lib/modify-pdf'
+import { modifyPdfWithCustomWords } from 'lib/modify-pdf/modifyPdfWithCustomWords'
 import { RedactionFields } from 'lib/modify-pdf/types'
 
 const defaultResumeExampleUrl = 'resume-example/openresume-resume.pdf'
@@ -20,6 +22,9 @@ export default function Home() {
   const [modifiedDoc, setModifiedDoc] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
+  const [customWords, setCustomWords] = useState<string[]>([])
+  const [fieldRedactedBytes, setFieldRedactedBytes] =
+    useState<Uint8Array | null>(null)
   const [redactionFields, setRedactionFields] = useState<RedactionFields>({
     name: false,
     email: false,
@@ -63,7 +68,6 @@ export default function Home() {
         )
       : []
 
-    console.log('selected', selected)
     setRedactionFields(createRedactionFieldsFromSelected(selected))
   }
 
@@ -82,11 +86,33 @@ export default function Home() {
     try {
       setLoading(true)
       setError(null)
-      const result = await modifyPdf(fileUrl, redactionFields)
-      setModifiedDoc(result)
+      const { objectUrl, pdfBytes } = await modifyPdf(fileUrl, redactionFields)
+      setFieldRedactedBytes(pdfBytes)
+      setModifiedDoc(objectUrl)
     } catch (err) {
       console.error('Error modifying PDF:', err)
       setError(err instanceof Error ? err : new Error('Error modifying PDF'))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleRedactCustomWords = async () => {
+    if (!fieldRedactedBytes || customWords.length === 0) return
+
+    try {
+      setLoading(true)
+      setError(null)
+      const objectUrl = await modifyPdfWithCustomWords(
+        fieldRedactedBytes,
+        customWords
+      )
+      setModifiedDoc(objectUrl)
+    } catch (err) {
+      console.error('Error redacting custom words:', err)
+      setError(
+        err instanceof Error ? err : new Error('Error redacting custom words')
+      )
     } finally {
       setLoading(false)
     }
@@ -126,9 +152,12 @@ export default function Home() {
 
         <div className="mt-3 mx-auto w-full max-w-[800px]">
           <ResumeDropzone
-            onFileUrlChange={(fileUrl) =>
+            onFileUrlChange={(fileUrl) => {
               setFileUrl(fileUrl || defaultResumeExampleUrl)
-            }
+              setModifiedDoc('')
+              setFieldRedactedBytes(null)
+              setCustomWords([])
+            }}
             setModifiedDoc={setModifiedDoc}
           />
         </div>
@@ -177,6 +206,25 @@ export default function Home() {
               </Button>
             )}
           </div>
+          {modifiedDoc && (
+            <div className="w-full max-w-[500px] mt-4">
+              <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                Custom Word Redaction
+              </h3>
+              <CustomWordRedaction
+                onWordsChange={(words) => setCustomWords(words)}
+              />
+              {customWords.length > 0 && (
+                <Button
+                  type="button"
+                  onClick={handleRedactCustomWords}
+                  className="mt-3"
+                >
+                  Redact Custom Words
+                </Button>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

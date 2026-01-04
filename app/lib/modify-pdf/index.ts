@@ -12,8 +12,6 @@ export async function modifyPdf(
 ) {
   const url = pdfURL
   const resume = await parseResumeFromPdf(pdfURL)
-  console.log('Parsed resume from resume modifier:', resume.profile)
-  console.log('educations listed:', resume.educations)
   const existingPdfBytes = await fetch(url).then((res) => res.arrayBuffer())
 
   const pdfDoc = await PDFDocument.load(existingPdfBytes)
@@ -75,5 +73,5 @@ export async function modifyPdf(
       : new Uint8Array(pdfBytes).buffer
   const blob = new Blob([arrayBuffer], { type: 'application/pdf' })
   const objectUrl = URL.createObjectURL(blob)
-  return objectUrl
+  return { objectUrl, pdfBytes }
 }
