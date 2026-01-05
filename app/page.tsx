@@ -264,12 +264,13 @@ export default function Home() {
           <div className="max-w-[500px]">
             <h2 className="font-bold text-teal-500">App Inspo</h2>
             <p>
-              This tool was inspired by its creator’s experience as a Talent
-              Leader, someone who deeply understands the friction of blind
-              screening without built-in ATS redaction. While most tracking
-              systems require tedious manual redaction line-by-line, this tool
-              automates profile and education redaction, removing the manual
-              burden and dramatically speeding up the process.
+              This tool was inspired by my experience as a Talent Leader and the
+              friction I experienced when trying to prepare blind resume
+              screening. The previous ATS systems I worked with did not have
+              redaction built in, so I had to do tedious manual redaction
+              line-by-line. This tool automates profile and education redaction,
+              removing the manual burden and dramatically speeding up the
+              process.
             </p>
           </div>
         </div>
