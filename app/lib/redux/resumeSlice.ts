@@ -3,7 +3,6 @@
  * © 2024 xitanggg (or original authors), licensed under AGPL-3.0
  */
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
-import type { RootState } from 'lib/redux/store'
 import type {
   FeaturedSkill,
   InitialResume,
@@ -138,20 +137,5 @@ export const resumeSlice = createSlice({
     },
   },
 })
-
-export const {
-  changeProfile,
-  changeEducations,
-  changeCustom,
-  addSectionInForm,
-  moveSectionInForm,
-  deleteSectionInFormByIdx,
-  setResume,
-} = resumeSlice.actions
-
-export const selectResume = (state: RootState) => state.resume
-export const selectProfile = (state: RootState) => state.resume.profile
-export const selectEducations = (state: RootState) => state.resume.educations
-export const selectCustom = (state: RootState) => state.resume.custom
 
 export default resumeSlice.reducer
