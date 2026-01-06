@@ -75,8 +75,7 @@ const computeFeatureScores = (
 export const getTextWithHighestFeatureScore = (
   textItems: TextItems,
   featureSets: FeatureSet[],
-  returnEmptyStringIfHighestScoreIsNotPositive = true,
-  returnConcatenatedStringForTextsWithSameHighestScore = false
+  returnEmptyStringIfHighestScoreIsNotPositive = true
 ) => {
   const textScores = computeFeatureScores(textItems, featureSets)
 

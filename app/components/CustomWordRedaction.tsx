@@ -66,7 +66,6 @@ export default function CustomWordRedaction({
                 type="button"
                 onClick={() => removeWord(word)}
                 className="rounded-full p-0.5 text-gray-400 transition-colors hover:bg-gray-200 hover:text-gray-600"
-                title={`Remove "${word}"`}
               >
                 <XMarkIcon className="h-4 w-4" />
               </button>

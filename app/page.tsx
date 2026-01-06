@@ -262,7 +262,7 @@ export default function Home() {
             className="hidden md:block flex-shrink-0 object-contain"
           />
           <div className="max-w-[500px]">
-            <h2 className="font-bold text-teal-500">App Inspo</h2>
+            <h2 className="font-bold text-teal-500">App Inspiration</h2>
             <p>
               This tool was inspired by my experience as a Talent Leader and the
               friction I experienced when trying to prepare blind resume

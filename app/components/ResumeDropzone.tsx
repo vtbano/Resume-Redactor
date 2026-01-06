@@ -1,3 +1,7 @@
+/*
+ * This file is adapted from OpenResume (https://github.com/xitanggg/open-resume)
+ * © 2024 xitanggg (or original authors), licensed under AGPL-3.0
+ */
 import { useState, useRef } from 'react'
 import { LockClosedIcon } from '@heroicons/react/24/solid'
 import { XMarkIcon } from '@heroicons/react/24/outline'
@@ -49,7 +53,7 @@ export const ResumeDropzone = ({
     setIsHoveredOnDropzone(false)
   }
 
-  const onInputChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
     if (!files) return
 
@@ -69,7 +73,7 @@ export const ResumeDropzone = ({
   return (
     <div
       className={cx(
-        'flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 ',
+        'flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6',
         isHoveredOnDropzone && 'border-sky-400',
         'pb-6 pt-4',
         className
@@ -108,26 +112,24 @@ export const ResumeDropzone = ({
           </div>
         )}
         <div className="pt-4">
-          <>
-            <label
-              className={cx(
-                'within-outline-theme-purple cursor-pointer rounded-full px-6 pb-2.5 pt-2 font-semibold shadow-sm',
-                'border'
-              )}
-            >
-              Browse file
-              <input
-                ref={fileInputRef}
-                type="file"
-                className="sr-only"
-                accept=".pdf"
-                onChange={onInputChange}
-              />
-            </label>
-            {hasNonPdfFile && (
-              <p className="mt-6 text-red-400">Only pdf file is supported</p>
+          <label
+            className={cx(
+              'within-outline-theme-purple cursor-pointer rounded-full px-6 pb-2.5 pt-2 font-semibold shadow-sm',
+              'border'
             )}
-          </>
+          >
+            Browse file
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="sr-only"
+              accept=".pdf"
+              onChange={onInputChange}
+            />
+          </label>
+          {hasNonPdfFile && (
+            <p className="mt-6 text-red-400">Only pdf file is supported</p>
+          )}
         </div>
       </div>
     </div>
