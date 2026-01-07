@@ -78,7 +78,11 @@ export const resumeSlice = createSlice({
     ) => {
       const { idx, field, value } = action.payload
       const education = draft.educations[idx]
-      education[field] = value as any
+      if (field === 'descriptions') {
+        education[field] = value as string[]
+      } else {
+        education[field] = value as string
+      }
     },
     changeCustom: (
       draft,
@@ -132,7 +136,7 @@ export const resumeSlice = createSlice({
         draft[form].splice(idx, 1)
       }
     },
-    setResume: (draft, action: PayloadAction<InitialResume>) => {
+    setResume: (_draft, action: PayloadAction<InitialResume>) => {
       return action.payload
     },
   },

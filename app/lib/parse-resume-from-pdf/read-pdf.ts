@@ -29,7 +29,6 @@ export const readPdf = async (fileUrl: string): Promise<TextItems> => {
     const pageTextItems = textContent.items.map((item) => {
       const {
         str: text,
-        dir,
         transform,
         fontName: pdfFontName,
         ...otherProps
