@@ -2,7 +2,7 @@
  * This file is adapted from OpenResume (https://github.com/xitanggg/open-resume)
  * © 2024 xitanggg (or original authors), licensed under AGPL-3.0
  */
-import type { ResumeKey } from '../redux/types'
+import type { ResumeKey } from 'types/resume'
 import type { Line, Lines, ResumeSectionToLines } from './types'
 import {
   hasLetterAndIsAllUpperCase,

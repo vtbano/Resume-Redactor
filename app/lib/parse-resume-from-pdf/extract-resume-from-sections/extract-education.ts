@@ -8,7 +8,7 @@ import type {
   FeatureSet,
   ResumeSectionToLines,
 } from 'lib/parse-resume-from-pdf/types'
-import type { ResumeEducation } from 'lib/redux/types'
+import type { ResumeEducation } from 'types/resume'
 import { getSectionLinesByKeywords } from 'lib/parse-resume-from-pdf/extract-resume-from-sections/lib/get-section-lines'
 import {
   DATE_FEATURE_SETS,

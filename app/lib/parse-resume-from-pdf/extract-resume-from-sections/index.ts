@@ -2,7 +2,7 @@
  * This file is adapted from OpenResume (https://github.com/xitanggg/open-resume)
  * © 2024 xitanggg (or original authors), licensed under AGPL-3.0
  */
-import type { Resume } from 'lib/redux/types'
+import type { Resume } from 'types/resume'
 import type { ResumeSectionToLines } from 'lib/parse-resume-from-pdf/types'
 import { extractProfile } from 'lib/parse-resume-from-pdf/extract-resume-from-sections/extract-profile'
 import { extractEducation } from 'lib/parse-resume-from-pdf/extract-resume-from-sections/extract-education'
