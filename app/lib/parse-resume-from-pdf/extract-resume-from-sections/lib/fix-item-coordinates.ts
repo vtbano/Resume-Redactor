@@ -1,4 +1,8 @@
 import type { TextItem } from 'lib/parse-resume-from-pdf/types'
+import {
+  CHAR_WIDTH_LEFT_CORRECTION_MULTIPLIER,
+  CHAR_WIDTH_PADDING_BUFFER_MULTIPLIER,
+} from 'lib/constants/pdf-constants'
 
 /**
  * Generic function to fix coordinates of extracted TextItems that are part of longer text
@@ -30,8 +34,14 @@ export function fixExtractedItemCoordinates(
           const idx = item.text.indexOf(field.text)
           if (idx !== -1) {
             const calculatedPosition = item.x + idx * charWidth
-            const leftCorrection = Math.max(charWidth * 0.5, 0)
-            const paddingBuffer = Math.max(charWidth * 1.2, 0)
+            const leftCorrection = Math.max(
+              charWidth * CHAR_WIDTH_LEFT_CORRECTION_MULTIPLIER,
+              0
+            )
+            const paddingBuffer = Math.max(
+              charWidth * CHAR_WIDTH_PADDING_BUFFER_MULTIPLIER,
+              0
+            )
 
             const newX = calculatedPosition - leftCorrection
             const newWidth = Math.max(

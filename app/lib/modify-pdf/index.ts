@@ -5,6 +5,7 @@ import { parseResumeFromPdf } from 'lib/parse-resume-from-pdf'
 import { addRedactedField } from 'lib/modify-pdf/addRedactedField'
 
 import { RedactionFields, RedactionFieldConfig } from 'lib/modify-pdf/types'
+import { TEXT_BOTTOM_OFFSET, HEIGHT_OFFSET } from 'lib/constants/pdf-constants'
 
 export async function modifyPdf(
   pdfURL: string,
@@ -37,8 +38,8 @@ export async function modifyPdf(
         page: pages[field.data.pageNumber - 1],
         fieldData: field.data,
         font: helveticaFont,
-        textBottomOffset: -4,
-        heightOffset: 2,
+        textBottomOffset: TEXT_BOTTOM_OFFSET,
+        heightOffset: HEIGHT_OFFSET,
       })
     }
   })

@@ -2,6 +2,12 @@ import { PDFDocument, StandardFonts } from 'pdf-lib'
 import { readPdf } from 'lib/parse-resume-from-pdf/read-pdf'
 import { addRedactedField } from 'lib/modify-pdf/addRedactedField'
 import type { TextItem } from 'lib/parse-resume-from-pdf/types'
+import {
+  CHAR_WIDTH_LEFT_CORRECTION_MULTIPLIER,
+  CHAR_WIDTH_PADDING_BUFFER_MULTIPLIER,
+  TEXT_BOTTOM_OFFSET,
+  HEIGHT_OFFSET,
+} from 'lib/constants/pdf-constants'
 
 export async function modifyPdfWithCustomWords(
   pdfBytes: Uint8Array,
@@ -53,8 +59,14 @@ export async function modifyPdfWithCustomWords(
           if (idx !== -1) {
             const charWidth = item.width / trimmed.length
             const calculatedX = item.x + idx * charWidth
-            const leftCorrection = Math.max(charWidth * 0.5, 0)
-            const paddingBuffer = Math.max(charWidth * 1.2, 0)
+            const leftCorrection = Math.max(
+              charWidth * CHAR_WIDTH_LEFT_CORRECTION_MULTIPLIER,
+              0
+            )
+            const paddingBuffer = Math.max(
+              charWidth * CHAR_WIDTH_PADDING_BUFFER_MULTIPLIER,
+              0
+            )
 
             const newX = calculatedX - leftCorrection
             const newWidth = Math.max(
@@ -82,8 +94,8 @@ export async function modifyPdfWithCustomWords(
       page: pages[match.pageNumber - 1],
       fieldData: match,
       font: helveticaFont,
-      textBottomOffset: -4,
-      heightOffset: 2,
+      textBottomOffset: TEXT_BOTTOM_OFFSET,
+      heightOffset: HEIGHT_OFFSET,
     })
   })
 
