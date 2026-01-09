@@ -5,56 +5,81 @@ import {
 } from 'lib/constants/pdf-constants'
 
 /**
+ * Filter valid extracted fields (non-null with text)
+ */
+const filterValidFields = (
+  extractedFields: Record<string, TextItem | null | undefined>
+): Record<string, TextItem> => {
+  return Object.entries(extractedFields).reduce(
+    (acc, [key, field]) => {
+      if (field?.text) {
+        acc[key] = { ...field }
+      }
+      return acc
+    },
+    {} as Record<string, TextItem>
+  )
+}
+
+/**
+ * Calculate corrected coordinates for a field within a text item
+ */
+const calculateCorrectedCoordinates = (
+  field: TextItem,
+  item: TextItem,
+  substringIndex: number
+): TextItem => {
+  const charWidth = item.width / item.text.length
+  const calculatedPosition = item.x + substringIndex * charWidth
+  const leftCorrection = Math.max(
+    charWidth * CHAR_WIDTH_LEFT_CORRECTION_MULTIPLIER,
+    0
+  )
+  const paddingBuffer = Math.max(
+    charWidth * CHAR_WIDTH_PADDING_BUFFER_MULTIPLIER,
+    0
+  )
+
+  const newX = calculatedPosition - leftCorrection
+  const newWidth = Math.max(field.text.length * charWidth + paddingBuffer, 0)
+
+  return { ...field, x: newX, width: newWidth }
+}
+
+/**
+ * Find and update coordinates for a single field in text items
+ */
+const findFieldInTextItems = (
+  field: TextItem,
+  textItems: TextItem[]
+): TextItem => {
+  for (const item of textItems) {
+    if (!item.text || item.text === field.text) continue
+
+    const substringIndex = item.text.indexOf(field.text)
+    if (substringIndex !== -1) {
+      return calculateCorrectedCoordinates(field, item, substringIndex)
+    }
+  }
+  return field
+}
+
+/**
  * Generic function to fix coordinates of extracted TextItems that are part of longer text
  * @param textItems - Array of all text items to search through
  * @param extractedFields - Object containing extracted TextItem fields to fix
  */
-
-export function fixExtractedItemCoordinates(
+export const fixExtractedItemCoordinates = (
   textItems: TextItem[],
   extractedFields: Record<string, TextItem | null | undefined>
-): Record<string, TextItem> {
-  // start with only the present fields (filter out null/undefined)
-  const updated: Record<string, TextItem> = {}
-  for (const [key, field] of Object.entries(extractedFields)) {
-    if (field && field.text) {
-      updated[key] = { ...field }
-    }
-  }
+): Record<string, TextItem> => {
+  const validFields = filterValidFields(extractedFields)
 
-  for (const item of textItems) {
-    if (!item.text) {
-      // skip empty items
-    } else {
-      const charWidth = item.text.length ? item.width / item.text.length : 0
-
-      for (const [key, field] of Object.entries(updated)) {
-        // only attempt correction when the candidate is a substring of a larger item
-        if (item.text !== field.text) {
-          const idx = item.text.indexOf(field.text)
-          if (idx !== -1) {
-            const calculatedPosition = item.x + idx * charWidth
-            const leftCorrection = Math.max(
-              charWidth * CHAR_WIDTH_LEFT_CORRECTION_MULTIPLIER,
-              0
-            )
-            const paddingBuffer = Math.max(
-              charWidth * CHAR_WIDTH_PADDING_BUFFER_MULTIPLIER,
-              0
-            )
-
-            const newX = calculatedPosition - leftCorrection
-            const newWidth = Math.max(
-              field.text.length * charWidth + paddingBuffer,
-              0
-            )
-
-            updated[key] = { ...field, x: newX, width: newWidth }
-          }
-        }
-      }
-    }
-  }
-
-  return updated
+  return Object.entries(validFields).reduce(
+    (acc, [key, field]) => {
+      acc[key] = findFieldInTextItems(field, textItems)
+      return acc
+    },
+    {} as Record<string, TextItem>
+  )
 }

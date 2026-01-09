@@ -9,6 +9,65 @@ import {
   HEIGHT_OFFSET,
 } from 'lib/constants/pdf-constants'
 
+const escapeRegex = (str: string): string => {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+const calculateMatchCoordinates = (
+  item: TextItem,
+  word: string,
+  trimmedText: string
+): TextItem | null => {
+  const idx = trimmedText.indexOf(word)
+  if (idx === -1) return null
+
+  const charWidth = item.width / trimmedText.length
+  const calculatedX = item.x + idx * charWidth
+  const leftCorrection = Math.max(
+    charWidth * CHAR_WIDTH_LEFT_CORRECTION_MULTIPLIER,
+    0
+  )
+  const paddingBuffer = Math.max(
+    charWidth * CHAR_WIDTH_PADDING_BUFFER_MULTIPLIER,
+    0
+  )
+
+  const newX = calculatedX - leftCorrection
+  const newWidth = Math.max(word.length * charWidth + paddingBuffer, 0)
+
+  return {
+    ...item,
+    text: word,
+    x: newX,
+    width: newWidth,
+  }
+}
+
+const findWordMatches = (
+  textItems: TextItem[],
+  customWords: string[]
+): TextItem[] => {
+  return textItems.flatMap((item) => {
+    const trimmed = item.text.trim()
+
+    return customWords
+      .map((word) => {
+        // Create regex with word boundaries to match whole words (case-sensitive)
+        const wordRegex = new RegExp(`\\b${escapeRegex(word)}\\b`)
+        if (!wordRegex.test(trimmed)) return null
+
+        // Exact match - use coordinates as-is
+        if (trimmed === word) {
+          return { ...item, text: word }
+        }
+
+        // Substring match - calculate word position
+        return calculateMatchCoordinates(item, word, trimmed)
+      })
+      .filter((match): match is TextItem => match !== null)
+  })
+}
+
 export async function modifyPdfWithCustomWords(
   pdfBytes: Uint8Array,
   customWords: string[]
@@ -33,58 +92,8 @@ export async function modifyPdfWithCustomWords(
   // Clean up temp URL that is no longer used
   URL.revokeObjectURL(tempUrl)
 
-  // Helper to escape regex special characters
-  const escapeRegex = (str: string) =>
-    str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-
   // Find all word matches and calculate coordinates for each occurrence
-  const fixedMatches: TextItem[] = []
-
-  textItems.forEach((item) => {
-    const trimmed = item.text.trim()
-    customWords.forEach((word) => {
-      // Create regex with word boundaries to match whole words within text (case-sensitive)
-      const wordRegex = new RegExp(`\\b${escapeRegex(word)}\\b`)
-      if (wordRegex.test(trimmed)) {
-        // Check if this is an exact match or substring match
-        if (trimmed === word) {
-          // Exact match - use coordinates as-is
-          fixedMatches.push({
-            ...item,
-            text: word,
-          })
-        } else {
-          // Substring match - calculate word position within the text
-          const idx = trimmed.indexOf(word)
-          if (idx !== -1) {
-            const charWidth = item.width / trimmed.length
-            const calculatedX = item.x + idx * charWidth
-            const leftCorrection = Math.max(
-              charWidth * CHAR_WIDTH_LEFT_CORRECTION_MULTIPLIER,
-              0
-            )
-            const paddingBuffer = Math.max(
-              charWidth * CHAR_WIDTH_PADDING_BUFFER_MULTIPLIER,
-              0
-            )
-
-            const newX = calculatedX - leftCorrection
-            const newWidth = Math.max(
-              word.length * charWidth + paddingBuffer,
-              0
-            )
-
-            fixedMatches.push({
-              ...item,
-              text: word,
-              x: newX,
-              width: newWidth,
-            })
-          }
-        }
-      }
-    })
-  })
+  const fixedMatches = findWordMatches(textItems, customWords)
 
   // Add redaction for each fixed match
   fixedMatches.forEach((match, index) => {
