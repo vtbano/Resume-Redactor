@@ -23,8 +23,6 @@ export default function Home() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
   const [customWords, setCustomWords] = useState<string[]>([])
-  const [fieldRedactedBytes, setFieldRedactedBytes] =
-    useState<Uint8Array | null>(null)
   const [redactionFields, setRedactionFields] = useState<RedactionFields>({
     name: false,
     email: false,
@@ -81,38 +79,29 @@ export default function Home() {
   }
 
   const hasSelectedFields = Object.values(redactionFields).some(Boolean)
+  const canRedact = hasSelectedFields || customWords.length > 0
 
-  const handleModifyPdf = async () => {
+  const handleRedactPdf = async () => {
     try {
       setLoading(true)
       setError(null)
+
+      // Step 1: Apply field redactions
       const { objectUrl, pdfBytes } = await modifyPdf(fileUrl, redactionFields)
-      setFieldRedactedBytes(pdfBytes)
-      setModifiedDoc(objectUrl)
-    } catch (err) {
-      console.error('Error modifying PDF:', err)
-      setError(err instanceof Error ? err : new Error('Error modifying PDF'))
-    } finally {
-      setLoading(false)
-    }
-  }
 
-  const handleRedactCustomWords = async () => {
-    if (!fieldRedactedBytes || customWords.length === 0) return
-
-    try {
-      setLoading(true)
-      setError(null)
-      const objectUrl = await modifyPdfWithCustomWords(
-        fieldRedactedBytes,
-        customWords
-      )
-      setModifiedDoc(objectUrl)
+      // Step 2: Apply custom word redactions if any
+      if (customWords.length > 0) {
+        const finalObjectUrl = await modifyPdfWithCustomWords(
+          pdfBytes,
+          customWords
+        )
+        setModifiedDoc(finalObjectUrl)
+      } else {
+        setModifiedDoc(objectUrl)
+      }
     } catch (err) {
-      console.error('Error redacting custom words:', err)
-      setError(
-        err instanceof Error ? err : new Error('Error redacting custom words')
-      )
+      console.error('Error redacting PDF:', err)
+      setError(err instanceof Error ? err : new Error('Error redacting PDF'))
     } finally {
       setLoading(false)
     }
@@ -127,7 +116,8 @@ export default function Home() {
     }),
     option: (provided, state) => ({
       ...provided,
-      backgroundColor: state.isFocused ? '#E6FFFA' : provided.backgroundColor,
+      backgroundColor: state.isFocused ? '#99F6E4' : provided.backgroundColor,
+      color: state.isFocused ? '#0F172A' : provided.color,
     }),
   }
 
@@ -155,76 +145,59 @@ export default function Home() {
             onFileUrlChange={(fileUrl) => {
               setFileUrl(fileUrl || defaultResumeExampleUrl)
               setModifiedDoc('')
-              setFieldRedactedBytes(null)
               setCustomWords([])
             }}
             setModifiedDoc={setModifiedDoc}
           />
         </div>
         <div className="flex flex-col gap-3 mt-6 items-center">
+          {!canRedact && (
+            <p className="text-gray-500 text-sm m-2">
+              Select at least one field or add custom words to redact
+            </p>
+          )}
           <div className="flex gap-2 mb-2">
-            <Button
+            <button
               type="button"
               onClick={handleSelectAll}
-              variant="secondary"
-              className="text-sm px-3 py-1"
+              className="rounded-md bg-teal-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors duration-200 hover:bg-teal-600"
             >
               Select All
-            </Button>
-            <Button
+            </button>
+            <button
               type="button"
               onClick={handleDeselectAll}
-              variant="secondary"
-              className="text-sm px-3 py-1"
+              className="rounded-md bg-teal-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors duration-200 hover:bg-teal-600"
             >
               Deselect All
-            </Button>
+            </button>
           </div>
-          <Select
-            instanceId="redaction-select"
-            isMulti
-            options={redactionOptions}
-            value={redactionOptions.filter(
-              (option) => redactionFields[option.value]
-            )}
-            onChange={handleRedactionChange}
-            placeholder="Redaction Field Options"
-            className="min-w-[300px]"
-            styles={selectStyles}
-          />
-          <div>
-            {!hasSelectedFields && (
-              <p className="text-gray-500 text-sm mt-1">
-                Select at least one field to enable PDF modification
-              </p>
-            )}
+          <div className="w-full max-w-[500px]">
+            <Select
+              instanceId="redaction-select"
+              isMulti
+              options={redactionOptions}
+              value={redactionOptions.filter(
+                (option) => redactionFields[option.value]
+              )}
+              onChange={handleRedactionChange}
+              placeholder="Redaction Field Options"
+              className="min-w-[300px]"
+              styles={selectStyles}
+            />
           </div>
-          <div>
-            {hasSelectedFields && (
-              <Button type="button" onClick={handleModifyPdf} className="mr-4">
-                Modify PDF
+          <div className="w-[calc(100%-2rem)] sm:w-[500px] mt-6">
+            <CustomWordRedaction
+              onWordsChange={(words) => setCustomWords(words)}
+            />
+          </div>
+          <div className="mt-4">
+            {canRedact && (
+              <Button type="button" onClick={handleRedactPdf}>
+                Redact PDF
               </Button>
             )}
           </div>
-          {modifiedDoc && (
-            <div className="w-full max-w-[500px] mt-4">
-              <h3 className="text-sm font-semibold text-gray-700 mb-2">
-                Custom Word Redaction
-              </h3>
-              <CustomWordRedaction
-                onWordsChange={(words) => setCustomWords(words)}
-              />
-              {customWords.length > 0 && (
-                <Button
-                  type="button"
-                  onClick={handleRedactCustomWords}
-                  className="mt-3"
-                >
-                  Redact Custom Words
-                </Button>
-              )}
-            </div>
-          )}
         </div>
       </div>
 
@@ -259,7 +232,7 @@ export default function Home() {
             alt="Review icon"
             width={300}
             height={300}
-            className="hidden md:block flex-shrink-0 object-contain"
+            className="hidden md:block flex-shrink-0 object-contain pr-4"
           />
           <div className="max-w-[500px]">
             <h2 className="font-bold text-teal-500">App Inspiration</h2>
@@ -315,7 +288,7 @@ export default function Home() {
             alt="Review icon"
             width={300}
             height={300}
-            className="hidden md:block flex-shrink-0 object-contain"
+            className="hidden md:block flex-shrink-0 object-contain pl-4"
           />
         </div>
       </section>

@@ -36,19 +36,19 @@ export default function CustomWordRedaction({
 
   return (
     <div className="space-y-3">
-      <div className="flex gap-2">
+      <div className="flex gap-2 w-full">
         <input
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyPress}
-          placeholder="Enter word to redact"
-          className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+          placeholder="Add custom words (e.g., company name, address)"
+          className="flex-1 min-w-0 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
         />
         <button
           type="button"
           onClick={addWord}
-          className="rounded-md bg-teal-500 px-4 py-2 text-sm font-semibold text-white transition-colors duration-200 hover:bg-teal-600"
+          className="rounded-md bg-teal-500 px-3 py-1.5 text-xs font-semibold text-white transition-colors duration-200 hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 shrink-0"
         >
           Add
         </button>
@@ -72,10 +72,6 @@ export default function CustomWordRedaction({
             </div>
           ))}
         </div>
-      )}
-
-      {customWords.length === 0 && (
-        <p className="text-sm text-gray-400">No custom words added yet</p>
       )}
     </div>
   )
