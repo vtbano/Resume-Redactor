@@ -18,9 +18,9 @@ const defaultResumeExampleUrl = 'resume-example/openresume-resume.pdf'
 type Option = { value: keyof RedactionFields; label: string }
 
 export default function Home() {
-  const [fileUrl, setFileUrl] = useState(defaultResumeExampleUrl)
-  const [modifiedDoc, setModifiedDoc] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [fileUrl, setFileUrl] = useState<string>(defaultResumeExampleUrl)
+  const [modifiedDoc, setModifiedDoc] = useState<string>('')
+  const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<Error | null>(null)
   const [customWords, setCustomWords] = useState<string[]>([])
   const [redactionFields, setRedactionFields] = useState<RedactionFields>({
@@ -35,7 +35,7 @@ export default function Home() {
     school: false,
   })
 
-  const redactionOptions = (
+  const redactionOptions: Option[] = (
     Object.keys(redactionFields) as (keyof RedactionFields)[]
   ).map((key) => ({
     value: key,
@@ -44,13 +44,18 @@ export default function Home() {
 
   const createRedactionFieldsFromSelected = (
     selected: (keyof RedactionFields)[]
-  ) => {
-    return Object.fromEntries(
-      (Object.keys(redactionFields) as (keyof RedactionFields)[]).map((key) => [
-        key,
-        selected.includes(key),
-      ])
-    ) as RedactionFields
+  ): RedactionFields => {
+    return {
+      name: selected.includes('name'),
+      email: selected.includes('email'),
+      phone: selected.includes('phone'),
+      address: selected.includes('address'),
+      url: selected.includes('url'),
+      graduation_date: selected.includes('graduation_date'),
+      degree: selected.includes('degree'),
+      gpa: selected.includes('gpa'),
+      school: selected.includes('school'),
+    }
   }
 
   const handleRedactionChange = (
@@ -188,7 +193,8 @@ export default function Home() {
           </div>
           <div className="w-[calc(100%-2rem)] sm:w-[500px] mt-6">
             <CustomWordRedaction
-              onWordsChange={(words) => setCustomWords(words)}
+              customWords={customWords}
+              setCustomWords={setCustomWords}
             />
           </div>
           <div className="mt-4">

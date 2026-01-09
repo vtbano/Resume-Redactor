@@ -9,7 +9,7 @@ import { RedactionFields, RedactionFieldConfig } from 'lib/modify-pdf/types'
 export async function modifyPdf(
   pdfURL: string,
   redactionFieldsRequested: RedactionFields
-) {
+): Promise<{ objectUrl: string; pdfBytes: Uint8Array }> {
   const url = pdfURL
   const resume = await parseResumeFromPdf(pdfURL)
   const existingPdfBytes = await fetch(url).then((res) => res.arrayBuffer())

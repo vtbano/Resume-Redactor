@@ -2,29 +2,26 @@ import { useState, KeyboardEvent } from 'react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 
 interface CustomWordRedactionProps {
-  onWordsChange: (words: string[]) => void
+  customWords: string[]
+  setCustomWords: (words: string[]) => void
 }
 
 export default function CustomWordRedaction({
-  onWordsChange,
+  customWords,
+  setCustomWords,
 }: CustomWordRedactionProps) {
-  const [inputValue, setInputValue] = useState('')
-  const [customWords, setCustomWords] = useState<string[]>([])
+  const [inputValue, setInputValue] = useState<string>('')
 
   const addWord = () => {
     const trimmedWord = inputValue.trim()
     if (trimmedWord && !customWords.includes(trimmedWord)) {
-      const updatedWords = [...customWords, trimmedWord]
-      setCustomWords(updatedWords)
-      onWordsChange(updatedWords)
+      setCustomWords([...customWords, trimmedWord])
       setInputValue('')
     }
   }
 
   const removeWord = (wordToRemove: string) => {
-    const updatedWords = customWords.filter((word) => word !== wordToRemove)
-    setCustomWords(updatedWords)
-    onWordsChange(updatedWords)
+    setCustomWords(customWords.filter((word) => word !== wordToRemove))
   }
 
   const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
