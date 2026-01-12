@@ -4,9 +4,7 @@ import {
   CHAR_WIDTH_PADDING_BUFFER_MULTIPLIER,
 } from 'lib/constants/pdf-constants'
 
-/**
- * Filter valid extracted fields (non-null with text)
- */
+
 const filterValidFields = (
   extractedFields: Record<string, TextItem | null | undefined>
 ): Record<string, TextItem> => {
@@ -21,9 +19,7 @@ const filterValidFields = (
   )
 }
 
-/**
- * Calculate corrected coordinates for a field within a text item
- */
+
 const calculateCorrectedCoordinates = (
   field: TextItem,
   item: TextItem,
@@ -46,9 +42,7 @@ const calculateCorrectedCoordinates = (
   return { ...field, x: newX, width: newWidth }
 }
 
-/**
- * Find and update coordinates for a single field in text items
- */
+
 const findFieldInTextItems = (
   field: TextItem,
   textItems: TextItem[]
