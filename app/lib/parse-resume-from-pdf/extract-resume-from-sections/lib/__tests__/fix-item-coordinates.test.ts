@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { fixExtractedItemCoordinates } from './fix-item-coordinates'
+import { fixExtractedItemCoordinates } from '../fix-item-coordinates'
 import type { TextItem } from 'lib/parse-resume-from-pdf/types'
 
 describe('fixExtractedItemCoordinates', () => {
@@ -67,18 +67,14 @@ describe('fixExtractedItemCoordinates', () => {
       }
 
       const result = fixExtractedItemCoordinates(textItems, extractedFields)
-      console.log('RESULT', result)
 
+      // 'Email: john@example.com' (length=23), x=10, width=200
+      // charWidth = 200/23 ≈ 8.696, substringIndex = 7
+      // newX = 10 + 7*8.696 - 8.696*0.5 ≈ 66.52
+      // newWidth = 16*8.696 + 8.696*1.2 ≈ 149.57
       expect(result.email).toBeDefined()
-      // The email starts at index 7 in "Email: john@example.com"
-      // CalculateCorrectedCoordinates functon
-      // charWidth = 200 / 23 ≈ 8.7
-      // calculatedPosition = 10 + 7 * 8.7 ≈ 70.9
-      // leftCorrection = 8.7 * 0.5 ≈ 4.35
-      // newX = 70.9 - 4.35 ≈ 66.55
       expect(result.email.x).toBeCloseTo(66.52, 1)
-      // newWidth = 17 * 8.7 + 8.7 * 1.2 ≈ 158.34
-      expect(result.email.width).toBeGreaterThan(0)
+      expect(result.email.width).toBeCloseTo(149.57, 1)
     })
   })
 

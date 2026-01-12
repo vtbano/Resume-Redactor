@@ -93,7 +93,7 @@ export const matchCityAndState = (item: TextItem) => {
   }
 
   const match = buildLocationMatch(cleaned, parts, idx, orig)
-  console.log(match)
+
   return match
 }
 

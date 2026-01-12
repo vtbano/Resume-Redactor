@@ -260,7 +260,7 @@ export default function Home() {
             </h2>
             <div className="max-w-[500px]">
               <a
-                className="flex items-center gap-2 hover:underline hover:underline-offset-4 font-bold text-teal-500"
+                className="flex items-center gap-2 hover:underline hover:underline-offset-4 font-bold text-teal-500 pt-4"
                 href="https://github.com/vtbano/Resume-Redactor/issues/1"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -273,7 +273,7 @@ export default function Home() {
                 the redaction features for free!
               </p>
               <a
-                className="flex items-center gap-2 hover:underline hover:underline-offset-4 font-bold text-teal-500"
+                className="flex items-center gap-2 hover:underline hover:underline-offset-4 font-bold text-teal-500 pt-4"
                 href="https://github.com/vtbano/Resume-Redactor/issues/2"
                 target="_blank"
                 rel="noopener noreferrer"

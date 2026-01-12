@@ -9,11 +9,11 @@ import {
   HEIGHT_OFFSET,
 } from 'lib/constants/pdf-constants'
 
-const escapeRegex = (str: string): string => {
+export const escapeRegex = (str: string): string => {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
-const calculateMatchCoordinates = (
+export const calculateMatchCoordinates = (
   item: TextItem,
   word: string,
   trimmedText: string
@@ -43,7 +43,7 @@ const calculateMatchCoordinates = (
   }
 }
 
-const findWordMatches = (
+export const findWordMatches = (
   textItems: TextItem[],
   customWords: string[]
 ): TextItem[] => {
